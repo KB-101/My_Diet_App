@@ -1,81 +1,30 @@
-const CACHE_NAME = "Diet-plan-v1.0";
+// sw.js - Simple Service Worker
+const CACHE_NAME = 'diet-plan-v1.0';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/icons/icon-72x72.png',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/manifest.json'
 ];
 
-// Install event
-self.addEventListener('install', (event) => {
-  console.log('Service Worker installing for mobile');
+self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(function(cache) {
+        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
-  self.skipWaiting();
 });
 
-// Fetch event - optimized for mobile
-self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
-
+self.addEventListener('fetch', function(event) {
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
-        // Return cached version if found
+      .then(function(response) {
         if (response) {
           return response;
         }
-
-        // For navigation requests, prioritize offline page
-        if (event.request.mode === 'navigate') {
-          return fetch(event.request)
-            .catch(() => {
-              return caches.match('/index.html');
-            });
-        }
-
-        // For other requests, try network first
-        return fetch(event.request)
-          .then((response) => {
-            // Cache successful responses
-            if (response.status === 200) {
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME)
-                .then((cache) => {
-                  cache.put(event.request, responseToCache);
-                });
-            }
-            return response;
-          })
-          .catch(() => {
-            // If request fails and it's an image, return a placeholder
-            if (event.request.destination === 'image') {
-              return caches.match('/icons/icon-192x192.png');
-            }
-          });
-      })
+        return fetch(event.request);
+      }
+    )
   );
-});
-
-// Activate event
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
 });
