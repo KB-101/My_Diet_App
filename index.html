@@ -10,9 +10,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Diet-Plan">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
-    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+    <link rel="icon" type="image/png" href="./icons/icon-192x192.png">
+    <link rel="manifest" href="./manifest.json">
     
     <style>
         :root {
@@ -2144,7 +2144,7 @@ Keep up the great work! 💪`;
             updateWaterGoal();
         });
 
-       // Enhanced PWA Installation
+        // Enhanced PWA Installation
         function setupPWA() {
             let deferredPrompt;
             const installButton = document.getElementById('installButton');
@@ -2231,12 +2231,14 @@ Keep up the great work! 💪`;
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw.js')
+                    // Use relative path for service worker
+                    navigator.serviceWorker.register('./sw.js')
                         .then(function(registration) {
                             console.log('ServiceWorker registration successful with scope: ', registration.scope);
                         })
                         .catch(function(error) {
                             console.log('ServiceWorker registration failed: ', error);
+                            // If service worker fails, the app should still work
                         });
                 });
             } else {
@@ -2266,6 +2268,8 @@ Keep up the great work! 💪`;
             console.log('- Navigator standalone:', navigator.standalone);
             console.log('- Manifest:', document.querySelector('link[rel="manifest"]')?.href);
         }
+
+        // You can call debugPWA() in console to check PWA status
     </script>
 </body>
 </html>
