@@ -707,6 +707,123 @@
             color: var(--primary-dark);
             margin-bottom: 10px;
         }
+        /* Bottom Install Button Styles */
+.install-btn {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+    white-space: nowrap;
+}
+
+.install-btn.show {
+    display: flex;
+}
+
+.install-btn:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.7);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+}
+
+/* Mobile optimization for installed app */
+@media (display-mode: standalone) {
+    /* Remove browser UI space */
+    body {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Adjust header for notch devices */
+    header {
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: 20px;
+    }
+    
+    /* Adjust bottom nav for home indicator */
+    .nav-bar {
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+    }
+    
+    /* Hide install button when app is installed */
+    .install-btn {
+        display: none !important;
+    }
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+    .install-btn {
+        bottom: 70px;
+        padding: 10px 20px;
+        font-size: 13px;
+    }
+    
+    /* Better touch targets */
+    .meal-card, .nav-btn-bottom, .water-btn, .weight-btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Improve button sizing */
+    .water-btn, .delete-btn, .close-btn {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Better form inputs */
+    .add-input, .weight-input input, .form-group input {
+        min-height: 44px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Adjust modal for mobile */
+    .modal-content {
+        margin: 20px auto;
+        width: 95%;
+        max-height: 85vh;
+    }
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
     </style>
 </head>
 <body>
@@ -716,8 +833,6 @@
             <div class="header-controls">
                 <button class="settings-toggle" id="settings-toggle">⚙️</button>
                 <button class="mode-toggle" id="mode-toggle">🌙</button>
-                <!-- Install Button -->
-                <button class="install-btn" id="installButton" onclick="installApp()">📲</button>
         </header>
             </div>
   
@@ -1016,8 +1131,8 @@
             <div class="settings-option">
                 <h4>About</h4>
                 <p style="font-size: 0.9em; color: var(--text-secondary);">
-                    Cordavo v1.0 - Ethiopian Weight Loss Plan<br>
-                    Designed for healthy, sustainable weight loss
+                    Diet-Plan v1.0 - Ethiopian Weight Loss Plan<br>
+                    Designed for Someone Special..!, 
                 </p>
             </div>
         </div>
@@ -1061,7 +1176,10 @@
         <button class="nav-btn-bottom" data-tab="progress-tab">Progress</button>
         <button class="nav-btn-bottom" data-tab="tips-tab">💡 Tips</button>
     </div>
-
+    <button class="install-btn" id="installButton">
+        <span>📲</span>
+        Install App
+    </button>
     <script>
         // User Profile
         let userProfile = {
@@ -2040,28 +2158,31 @@ Keep up the great work! 💪`;
             updateWaterGoal();
         });
 
-        // PWA Installation
-        let deferredPrompt;
-        const installButton = document.getElementById('installButton');
+        // Open meal modal
+function openMealModal(mealType) {
+    currentDay = appState.currentDay;
+    currentMeal = mealType;
+    currentItems = [...appState.weeklyMealPlan[currentDay][mealType]];
+    
+    document.getElementById('modal-title').textContent = `Edit ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}`;
+    renderMealItems();
+    calculateCalories();
+    openModal(document.getElementById('edit-modal'));
+}
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installButton.style.display = 'block';
-        });
-
-        async function installApp() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    installButton.style.display = 'none';
-                    showNotification('App installed successfully!', 'success');
-                }
-                deferredPrompt = null;
-            }
-        }
-
+// Open settings modal
+function openSettingsModal() {
+    // Populate settings form with current values
+    document.getElementById('profile-name').value = userProfile.name;
+    document.getElementById('profile-height').value = userProfile.height;
+    document.getElementById('profile-starting-weight').value = userProfile.startingWeight;
+    document.getElementById('profile-goal-weight').value = userProfile.goalWeight;
+    document.getElementById('water-goal-input').value = appState.waterGoal;
+    document.getElementById('sound-toggle').checked = appState.soundEnabled;
+    document.getElementById('meal-reminders-toggle').checked = appState.remindersEnabled;
+    
+    openModal(document.getElementById('settings-modal'));
+}
         // Simple Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
