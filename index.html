@@ -1205,6 +1205,8 @@ function generateWeeklyPlan() {
             // Set up tab navigation FIRST
             setupTabNavigation();
 
+            // Check and reset water for new day
+            checkAndResetDailyWater();
             
             // Check if profile is complete
             if (!userProfile.name) {
@@ -1412,7 +1414,18 @@ function updateWaterTracker() {
             amount: appState.waterIntake
         });
     }
+    // Check and reset water intake for new day
+function checkAndResetDailyWater() {
+    const today = new Date().toISOString().split('T')[0];
+    const lastWaterEntry = appState.waterLog[appState.waterLog.length - 1];
     
+    // If we don't have an entry for today, reset water intake
+    if (!lastWaterEntry || lastWaterEntry.date !== today) {
+        appState.waterIntake = 0;
+        updateWaterTracker();
+        showNotification("New day! Water tracker has been reset 💧", "info");
+    }
+}
     // Update water chart
     updateCharts();
     
@@ -1703,7 +1716,7 @@ function updateCharts() {
             }
         }
         
-        // Tab navigation - CORRECTED VERSION
+        // Tab navigation
 function setupTabNavigation() {
     const navButtons = document.querySelectorAll('.nav-btn-bottom');
     
