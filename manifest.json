@@ -3,6 +3,7 @@
   "short_name": "Diet-Plan",
   "description": "Personalized Ethiopian weight loss diet plan tracker",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#4CAF50",
   "theme_color": "#2E7D32",
