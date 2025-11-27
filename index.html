@@ -1,0 +1,2087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diet-Plan</title>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#2E7D32">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Diet-Plan">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --secondary: #2196F3;
+            --background: #f5f7fa;
+            --surface: #ffffff;
+            --text: #333333;
+            --text-secondary: #666666;
+            --border: #e0e0e0;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --error: #f44336;
+            --shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .dark-mode {
+            --primary: #66BB6A;
+            --primary-dark: #388E3C;
+            --secondary: #42A5F5;
+            --background: #121212;
+            --surface: #1e1e1e;
+            --text: #e0e0e0;
+            --text-secondary: #9e9e9e;
+            --border: #424242;
+            --shadow: 0 3px 10px rgba(0,0,0,0.3);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            padding-top: 90px; /* Space for sticky header */
+            padding-bottom: 80px; /* Space for bottom navigation */
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mode-toggle, .settings-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .progress-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .progress-container {
+            margin: 15px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+        
+        .water-tracker {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .dark-mode .water-tracker {
+            background: #1a237e;
+        }
+        
+        .current-day {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .meal-section {
+            background: var(--surface);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .meal-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            cursor: pointer;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .dark-mode .meal-card {
+            background: #2d2d2d;
+        }
+        
+        .meal-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+        
+        .meal-card p {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+        
+        .edit-modal, .settings-modal, .profile-setup-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: var(--surface);
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .close-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .meal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin: 5px 0;
+        }
+        
+        .dark-mode .meal-item {
+            background: #2d2d2d;
+        }
+        
+        .delete-btn {
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .add-form {
+            display: flex;
+            margin-top: 10px;
+        }
+        
+        .add-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px 0 0 4px;
+            background: var(--surface);
+            color: var(--text);
+        }
+        
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .save-btn {
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+        
+        .tips-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+        }
+        
+        .tip-card {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .dark-mode .tip-card {
+            background: #332701;
+            border-color: #ff9800;
+        }
+        
+        .section-title {
+            font-size: 1.1em;
+            color: var(--primary-dark);
+            margin: 10px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .water-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .water-progress {
+            flex: 1;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .water-fill {
+            height: 100%;
+            background: var(--secondary);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .water-controls {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .water-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+        
+        .weight-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .weight-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--surface);
+            color: var(--text);
+        }
+        
+        .weight-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        
+        .day-selector {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .weekly-plan {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .day-plan {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .day-plan h4 {
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .day-plan-item {
+            padding: 5px 0;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+        
+        .progress-chart {
+            height: 200px;
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            border: 1px solid var(--border);
+        }
+        
+        .chart-bar {
+            width: 20px;
+            background: var(--primary);
+            margin: 0 5px;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.7em;
+        }
+        
+        .chart-value {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.7em;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid var(--border);
+        }
+        
+        .nav-btn-bottom {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            color: var(--text);
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .nav-btn-bottom.active {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .food-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+        }
+        
+        .dark-mode .food-list {
+            background: #2d2d2d;
+        }
+        
+        .food-list h4 {
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+        
+        .food-list ul {
+            padding-left: 15px;
+        }
+        
+        .food-list li {
+            margin: 3px 0;
+            font-size: 0.85em;
+        }
+        
+        .suggestions {
+            margin-top: 10px;
+        }
+        
+        .suggestion-item {
+            display: inline-block;
+            background: #e8f5e9;
+            color: var(--primary-dark);
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+        
+        .dark-mode .suggestion-item {
+            background: #1b5e20;
+            color: white;
+        }
+        
+        .calorie-estimator {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .dark-mode .calorie-estimator {
+            background: #332701;
+            border-color: #ff9800;
+        }
+        
+        .weight-log {
+            background: var(--surface);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .weight-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .weight-date {
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+        
+        .share-section {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .share-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .settings-option {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--text);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text);
+        }
+        
+        .profile-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .profile-info-item {
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .dark-mode .profile-info-item {
+            background: #2d2d2d;
+        }
+        
+        .profile-info-label {
+            font-weight: bold;
+            color: var(--primary-dark);
+            font-size: 0.85em;
+        }
+        
+        .profile-info-value {
+            font-size: 1em;
+            margin-top: 5px;
+        }
+        
+        .setup-welcome {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .setup-welcome h2 {
+            color: var(--primary-dark);
+            margin-bottom: 10px;
+        }
+        .install-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="user-header">👤 User</h1>
+            <div class="header-controls">
+                <button class="settings-toggle" id="settings-toggle">⚙️</button>
+                <button class="mode-toggle" id="mode-toggle">🌙</button>
+            </div>
+             <!-- Install Button -->
+            <button class="install-btn" id="installButton" onclick="installApp()">📲</button>
+        </header>
+        
+        <!-- Home Tab -->
+        <div id="home-tab" class="tab-content active">
+            <div class="progress-section">
+                <h2 class="section-title">📊 Weight Progress</h2>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>Progress: <span id="current-progress">0%</span></span>
+                        <span><span id="current-weight">0</span>kg → <span id="goal-weight">0</span>kg</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 8px; font-size: 0.9em;">
+                        <span id="remaining-weight">0</span>kg to go
+                    </p>
+                </div>
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Height</div>
+                        <div class="profile-info-value" id="height-display">0 cm</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Current</div>
+                        <div class="profile-info-value" id="current-weight-display">0 kg</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Goal</div>
+                        <div class="profile-info-value" id="goal-weight-display">0 kg</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Target</div>
+                        <div class="profile-info-value" id="target-weight-display">0 kg</div>
+                    </div>
+                </div>
+                <div class="weight-input">
+                    <input type="number" id="weight-input" placeholder="Enter current weight" step="0.1">
+                    <button class="weight-btn" onclick="updateWeight()">Update</button>
+                </div>
+            </div>
+            
+            <div class="current-day">
+                <h2 class="section-title">📅 Today: <span id="current-day-name">Wednesday</span></h2>
+            </div>
+            
+            <div class="meal-section">
+                <h2 class="section-title">🍳 Today's Meals</h2>
+                <div class="meal-card" onclick="openMealModal('breakfast')">
+                    <h4>Breakfast</h4>
+                    <p id="breakfast-display">Loading...</p>
+                </div>
+                
+                <div class="meal-card" onclick="openMealModal('lunch')">
+                    <h4>Lunch</h4>
+                    <p id="lunch-display">Loading...</p>
+                </div>
+                
+                <div class="meal-card" onclick="openMealModal('dinner')">
+                    <h4>Dinner</h4>
+                    <p id="dinner-display">Loading...</p>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <h2 class="section-title">💧 Water Tracker</h2>
+                <div class="water-tracker">
+                    <div class="water-container">
+                        <span id="water-count">0</span>
+                        <div class="water-progress">
+                            <div class="water-fill" id="water-fill" style="width: 0%"></div>
+                        </div>
+                        <span>/ <span id="water-goal-display">4</span>L</span>
+                    </div>
+                    <div class="water-controls">
+                        <button class="water-btn" id="water-minus">-</button>
+                        <button class="water-btn" id="water-plus">+</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="weight-log" id="weight-log">
+                <!-- Weight entries will be added here -->
+            </div>
+        </div>
+        
+        <!-- Plan Tab -->
+<div id="plan-tab" class="tab-content">
+    <div class="current-day">
+        <h2 class="section-title">📅 Weekly Meal Plan</h2>
+        <select class="day-selector" id="day-selector" onchange="selectDay()">
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday" selected>Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+            <option value="sunday">Sunday</option>
+        </select>
+    </div>
+    
+    <div class="weekly-plan" id="weekly-plan-container">
+        <!-- Weekly plan will be generated dynamically here -->
+    </div>
+</div>
+        
+        <!-- Progress Tab -->
+        <div id="progress-tab" class="tab-content">
+            <div class="progress-section">
+                <h2 class="section-title">📊 Weight Progress</h2>
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span>Progress: <span id="progress-percent">0%</span></span>
+                        <span><span id="current-wt">0</span>kg → <span id="goal-wt">0</span>kg</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="wt-progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p style="text-align: center; margin-top: 8px; font-size: 0.9em;">
+                        <span id="wt-remaining">0</span>kg to go
+                    </p>
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <h2 class="section-title">📈 Weight Progress Chart</h2>
+                <div class="progress-chart" id="weight-chart">
+                    <!-- Chart will be generated here -->
+                </div>
+            </div>
+            
+            <div class="progress-section">
+                <h2 class="section-title">📊 Water Intake Chart</h2>
+                <div class="progress-chart" id="water-chart">
+                    <!-- Chart will be generated here -->
+                </div>
+            </div>
+            
+            <div class="share-section">
+                <h2 class="section-title">🎉 Share Your Progress</h2>
+                <p>Celebrate your achievements and motivate others!</p>
+                <button class="share-btn" onclick="shareProgress()">Share My Progress</button>
+                <button class="share-btn" onclick="generateWeeklyReport()">Weekly Report</button>
+            </div>
+        </div>
+        
+        <!-- Tips Tab -->
+        <div id="tips-tab" class="tab-content">
+            <div class="tips-section">
+                <h2 class="section-title">💡 Daily Tip</h2>
+                <div class="tip-card" id="daily-tip">
+                    Eat dinner before 7:30 PM to support your slow metabolism
+                </div>
+            </div>
+            
+            <div class="food-list">
+                <h4>✅ Allowed Foods</h4>
+                <ul>
+                    <li>Coffee (no sugar)</li>
+                    <li>Vegetables</li>
+                    <li>Eggs</li>
+                    <li>Lean meats</li>
+                    <li>Ayib</li>
+                    <li>Lentils</li>
+                    <li>Fruits</li>
+                    <li>Nuts</li>
+                </ul>
+            </div>
+            
+            <div class="food-list">
+                <h4>❌ Foods to Avoid</h4>
+                <ul>
+                    <li>Bizu injera</li>
+                    <li>Sugary coffee</li>
+                    <li>Excess bread</li>
+                    <li>Fried foods</li>
+                    <li>Sugary foods</li>
+                    <li>Kibe-heavy dishes</li>
+                    <li>High carb foods</li>
+                    <li>Junk foods</li>
+                </ul>
+            </div>
+            
+            <div class="tips-section">
+                <h2 class="section-title">📋 Healthy Tips</h2>
+                <div class="tip-card">
+                    Focus on protein to speed up metabolism
+                </div>
+                <div class="tip-card">
+                    Drink 3-4 liters of water daily
+                </div>
+                <div class="tip-card">
+                    Eat dinner before 7:30 PM
+                </div>
+                <div class="tip-card">
+                    Avoid long fasting periods
+                </div>
+                <div class="tip-card">
+                    Move for 30 minutes daily
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Meal Modal -->
+    <div class="edit-modal" id="edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Meal</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="meal-items">
+                <!-- Meal items will be populated here -->
+            </div>
+            <div class="add-form">
+                <input type="text" class="add-input" id="new-item" placeholder="Add new item...">
+                <button class="add-btn" onclick="addItem()">+</button>
+            </div>
+            <div class="suggestions">
+                <h4>💡 Ethiopian Food Suggestions:</h4>
+                <span class="suggestion-item" onclick="addSuggestion('2 boiled eggs')">2 boiled eggs</span>
+                <span class="suggestion-item" onclick="addSuggestion('1 cup of coffee (no sugar)')">1 cup coffee</span>
+                <span class="suggestion-item" onclick="addSuggestion('1 injera')">1 injera</span>
+                <span class="suggestion-item" onclick="addSuggestion('Misir wot')">Misir wot</span>
+                <span class="suggestion-item" onclick="addSuggestion('Gomen')">Gomen</span>
+                <span class="suggestion-item" onclick="addSuggestion('Kinche')">Kinche</span>
+                <span class="suggestion-item" onclick="addSuggestion('1 cup of tea')">1 cup tea</span>
+                <span class="suggestion-item" onclick="addSuggestion('Small salad')">Small salad</span>
+            </div>
+            <div class="calorie-estimator">
+                <strong>Estimated Calories:</strong> <span id="calorie-count">0</span> cal
+            </div>
+            <button class="save-btn" onclick="saveMeal()">Save Changes</button>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="settings-modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
+            </div>
+            
+            <div class="settings-option">
+                <h4>Profile</h4>
+                <div class="form-group">
+                    <label for="profile-name">Name</label>
+                    <input type="text" id="profile-name" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label for="profile-height">Height (cm)</label>
+                    <input type="number" id="profile-height" placeholder="Height in cm">
+                </div>
+                <div class="form-group">
+                    <label for="profile-starting-weight">Starting Weight (kg)</label>
+                    <input type="number" id="profile-starting-weight" placeholder="Starting weight" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="profile-goal-weight">Goal Weight (kg)</label>
+                    <input type="number" id="profile-goal-weight" placeholder="Goal weight" step="0.1">
+                </div>
+                <button class="save-btn" onclick="saveProfile()">Save Profile</button>
+            </div>
+            
+            <div class="settings-option">
+                <h4>Settings</h4>
+                <div class="form-group">
+                    <label for="water-goal-input">Water Goal (liters)</label>
+                    <input type="number" id="water-goal-input" placeholder="Water goal in liters" step="0.5" min="1" max="10">
+                </div>
+                <label>
+                    Enable Sound Notifications
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="sound-toggle" checked>
+                        <span class="slider"></span>
+                    </div>
+                </label>
+                <label>
+                    Meal Reminders
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="meal-reminders-toggle" checked>
+                        <span class="slider"></span>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="settings-option">
+                <h4>Data Management</h4>
+                <button class="save-btn" onclick="exportData()" style="background: var(--secondary); margin-bottom: 10px;">Export Data</button>
+                <button class="save-btn" onclick="importData()" style="background: var(--warning); margin-bottom: 10px;">Import Data</button>
+                <button class="save-btn" onclick="resetData()" style="background: var(--error);">Reset All Data</button>
+            </div>
+            
+            <div class="settings-option">
+                <h4>About</h4>
+                <p style="font-size: 0.9em; color: var(--text-secondary);">
+                    Cordavo v1.0 - Ethiopian Weight Loss Plan<br>
+                    Designed for healthy, sustainable weight loss
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Setup Modal -->
+    <div class="profile-setup-modal" id="profile-setup-modal">
+        <div class="modal-content">
+            <div class="setup-welcome">
+                <h2>Welcome Aytoye!</h2>
+                <p>Let's set up your personalized weight loss plan</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="setup-name">Your Name</label>
+                <input type="text" id="setup-name" placeholder="Enter your name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="setup-height">Height (cm)</label>
+                <input type="number" id="setup-height" placeholder="Your height in cm" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="setup-starting-weight">Current Weight (kg)</label>
+                <input type="number" id="setup-starting-weight" placeholder="Your current weight" step="0.1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="setup-goal-weight">Goal Weight (kg)</label>
+                <input type="number" id="setup-goal-weight" placeholder="Your goal weight" step="0.1" required>
+            </div>
+            
+            <button class="save-btn" onclick="completeSetup()">Start My Journey</button>
+        </div>
+    </div>
+    
+    <div class="nav-bar">
+        <button class="nav-btn-bottom active" data-tab="home-tab">🏠 Home</button>
+        <button class="nav-btn-bottom" data-tab="plan-tab">| Plan |</button>
+        <button class="nav-btn-bottom" data-tab="progress-tab">| Progress |</button>
+        <button class="nav-btn-bottom" data-tab="tips-tab">💡 Tips</button>
+    </div>
+
+    <script>
+        // User Profile
+        let userProfile = {
+            name: "",
+            height: 0,
+            startingWeight: 0,
+            goalWeight: 0
+        };
+        
+        // App State
+        let appState = {
+            currentWeight: 0,
+            weeklyMealPlan: null,
+            waterIntake: 0,
+            currentDay: 'wednesday',
+            weightLog: [],
+            waterLog: [],
+            waterGoal: 4,
+            soundEnabled: true,
+            remindersEnabled: true
+        };
+         
+        // Generate weekly meal plan display
+function generateWeeklyPlan() {
+    const container = document.getElementById('weekly-plan-container');
+    if (!container) return;
+    
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    
+    container.innerHTML = '';
+    
+    days.forEach(day => {
+        const dayPlan = appState.weeklyMealPlan[day];
+        const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1);
+        
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'day-plan';
+        dayDiv.innerHTML = `
+            <h4>${dayCapitalized}</h4>
+            <div class="day-plan-item" onclick="editMeal('${day}', 'breakfast')">Breakfast: ${dayPlan.breakfast.join(', ')}</div>
+            <div class="day-plan-item" onclick="editMeal('${day}', 'lunch')">Lunch: ${dayPlan.lunch.join(', ')}</div>
+            <div class="day-plan-item" onclick="editMeal('${day}', 'dinner')">Dinner: ${dayPlan.dinner.join(', ')}</div>
+        `;
+        
+        container.appendChild(dayDiv);
+        if (!dayPlan || !dayPlan.breakfast) {
+    console.warn(`No meal plan found for ${day}`);
+    return;
+}
+    });
+}
+
+        // Default diet plan
+        const defaultPlan = {
+            monday: {
+                breakfast: ["2-3 boiled eggs", "1 cup of coffee (no sugar)"],
+                lunch: ["1 injera", "Misir wot", "Gomen", "1 cup of coffee"],
+                dinner: ["Any fruit (apple/orange)", "1 cup of tea"]
+            },
+            tuesday: {
+                breakfast: ["2 boiled eggs", "1 cup coffee"],
+                lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup of coffee"],
+                dinner: ["Water melon or Zaba juice (no sugar)"]
+            },
+            wednesday: {
+                breakfast: ["Full with 2 eggs", "1 cup of coffee"],
+                lunch: ["Kinche with 2 pieces of carrots", "1 cup coffee"],
+                dinner: ["A small salad (lettuce, tomato, onion, lemon)"]
+            },
+            thursday: {
+                breakfast: ["2 eggs + sandwich with grain bread", "1 cup coffee"],
+                lunch: ["1 boiled egg", "2 cups of 'Girgir' + 2 cups of firfir (small portion)", "1 cup coffee"],
+                dinner: ["Banana or extra tea"]
+            },
+            friday: {
+                breakfast: ["Avocado (½ fruit) + banana (½ fruit)", "1 cup coffee"],
+                lunch: ["2 small pieces of potato", "Boiled vegetables", "1 cup coffee"],
+                dinner: ["Water melon or Zaba juice"]
+            },
+            saturday: {
+                breakfast: ["2-3 boiled eggs", "1 cup coffee"],
+                lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup coffee"],
+                dinner: ["Banana or tea"]
+            },
+            sunday: {
+                breakfast: ["2 eggs + 4 small balls of dabo", "1 cup coffee"],
+                lunch: ["1 boiled egg", "2 cups of Girgir", "1 cup coffee"],
+                dinner: ["Banana or tea"]
+            }
+        };
+        
+        // Food calorie estimates
+        const foodCalories = {
+            'boiled eggs': 70, // per egg
+            'coffee': 2, // per cup
+            'injera': 100, // per piece
+            'misir wot': 150, // per serving
+            'gomen': 80, // per serving
+            'kinche': 200, // per serving
+            'carrots': 40, // per serving
+            'tea': 2, // per cup
+            'fruit': 80, // per piece
+            'salad': 50, // per serving
+            'banana': 105, // per fruit
+            'zaba juice': 120, // per glass
+            'potato': 160, // per serving
+            'vegetables': 50, // per serving
+            'dabo': 150, // per 4 balls
+            'girgir': 200, // per serving
+            'fifir': 180, // per serving
+            'avocado': 240, // per ½ fruit
+            'sandwich': 300 // per sandwich
+        };
+        
+        // App state
+        let currentMeal = null;
+        let currentDay = null;
+        let currentItems = [];
+        
+        // Initialize the app
+        function initApp() {
+            loadProfile();
+            loadAppState();
+            generateWeeklyPlan();
+
+            // Set up tab navigation FIRST
+            setupTabNavigation();
+
+            
+            // Check if profile is complete
+            if (!userProfile.name) {
+                showProfileSetup();
+                return;
+            }
+            
+            // Initialize water buttons
+    document.getElementById('water-plus').addEventListener('click', function() {
+        if (appState.waterIntake < appState.waterGoal) {
+            appState.waterIntake += 0.25;
+            updateWaterTracker();
+            showNotification("Great! Keep hydrating 💧", "success");
+        }
+    });
+    
+    document.getElementById('water-minus').addEventListener('click', function() {
+        if (appState.waterIntake > 0) {
+            appState.waterIntake -= 0.25;
+            updateWaterTracker();
+        }
+    }); 
+            updateUI();
+            scheduleReminders();
+            loadSettings();
+        }
+        
+        // Load profile from localStorage
+        function loadProfile() {
+            const savedProfile = localStorage.getItem('cordavoProfile');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+            }
+        }
+        
+        // Save profile to localStorage
+        function saveProfile() {
+            localStorage.setItem('cordavoProfile', JSON.stringify(userProfile));
+            updateUI();
+            closeSettingsModal();
+            showNotification("Profile updated successfully!", "success");
+        }
+        
+        // Load app state from localStorage
+        function loadAppState() {
+            const savedAppState = localStorage.getItem('cordavoAppState');
+            if (savedAppState) {
+                appState = JSON.parse(savedAppState);
+            } else {
+                // Initialize with default values
+                appState.weeklyMealPlan = JSON.parse(JSON.stringify(defaultPlan));
+                appState.currentWeight = userProfile.startingWeight || 72;
+            }
+            
+            // Ensure weeklyMealPlan is always set
+            if (!appState.weeklyMealPlan) {
+                appState.weeklyMealPlan = JSON.parse(JSON.stringify(defaultPlan));
+            }
+        }
+        
+        // Save app state to localStorage
+        function saveAppState() {
+            localStorage.setItem('cordavoAppState', JSON.stringify(appState));
+        }
+        
+        // Show profile setup modal
+        function showProfileSetup() {
+            document.getElementById('profile-setup-modal').style.display = 'block';
+        }
+        
+        // Complete profile setup
+        function completeSetup() {
+            const name = document.getElementById('setup-name').value.trim();
+            const height = parseFloat(document.getElementById('setup-height').value);
+            const startingWeight = parseFloat(document.getElementById('setup-starting-weight').value);
+            const goalWeight = parseFloat(document.getElementById('setup-goal-weight').value);
+            
+            if (name && height && startingWeight && goalWeight) {
+                userProfile.name = name;
+                userProfile.height = height;
+                userProfile.startingWeight = startingWeight;
+                userProfile.goalWeight = goalWeight;
+                
+                appState.currentWeight = startingWeight;
+                
+                saveProfile();
+                saveAppState();
+                
+                document.getElementById('profile-setup-modal').style.display = 'none';
+                updateUI();
+                showNotification("Welcome to Cordavo, " + name + "!", "success");
+            } else {
+                showNotification("Please fill in all fields", "error");
+            }
+            if (goalWeight >= startingWeight) {
+    showNotification("Goal weight should be less than starting weight", "error");
+    return;
+}
+        }
+        
+        // Update the entire UI
+        function updateUI() {
+    updateHeader();
+    updateProgress();
+    updateWaterTracker();
+    updateDailyTip();
+    loadCurrentDayMeals();
+    updateDayDisplay();
+    updateWeightLog();
+    updateCharts();
+    generateWeeklyPlan(); // Add this
+}
+        
+        // Update header with user's name
+        function updateHeader() {
+            document.getElementById('user-header').textContent = "👤 " + userProfile.name;
+        }
+        
+        // Update progress bar
+        function updateProgress() {
+            const totalWeightLoss = userProfile.startingWeight - userProfile.goalWeight;
+            const currentLoss = userProfile.startingWeight - appState.currentWeight;
+            const progress = (currentLoss / totalWeightLoss) * 100;
+            
+            document.getElementById('progress-fill').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('current-progress').textContent = `${Math.round(progress)}%`;
+            document.getElementById('current-weight').textContent = appState.currentWeight.toFixed(1);
+            document.getElementById('current-weight-display').textContent = `${appState.currentWeight.toFixed(1)} kg`;
+            document.getElementById('goal-weight').textContent = userProfile.goalWeight;
+            document.getElementById('goal-weight-display').textContent = `${userProfile.goalWeight} kg`;
+            document.getElementById('remaining-weight').textContent = (userProfile.startingWeight - appState.currentWeight).toFixed(1);
+            document.getElementById('target-weight-display').textContent = `${(userProfile.startingWeight - userProfile.goalWeight).toFixed(1)} kg`;
+            document.getElementById('height-display').textContent = `${userProfile.height} cm`;
+            
+            // Update progress tab
+            document.getElementById('wt-progress-fill').style.width = `${Math.min(progress, 100)}%`;
+            document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+            document.getElementById('current-wt').textContent = appState.currentWeight.toFixed(1);
+            document.getElementById('goal-wt').textContent = userProfile.goalWeight;
+            document.getElementById('wt-remaining').textContent = (userProfile.startingWeight - appState.currentWeight).toFixed(1);
+            
+            saveAppState();
+        }
+        
+        // Update weight
+function updateWeight() {
+    const input = document.getElementById('weight-input');
+    const newWeight = parseFloat(input.value);
+    
+    if (newWeight && newWeight > 0 && newWeight <= userProfile.startingWeight) {
+        appState.currentWeight = newWeight;
+        
+        // Add to weight log
+        const today = new Date().toISOString().split('T')[0];
+        appState.weightLog.push({
+            date: today,
+            weight: newWeight
+        });
+        
+        updateProgress();
+        updateWeightLog();
+        updateCharts(); // Make sure charts are updated
+        input.value = '';
+        
+        // Show notification
+        showNotification("Weight updated successfully!", "success");
+    } else if (newWeight) {
+        showNotification("Please enter a valid weight (0 < weight ≤ starting weight)", "error");
+    }
+}
+        
+        // Update weight log display
+        function updateWeightLog() {
+            const logContainer = document.getElementById('weight-log');
+            logContainer.innerHTML = '';
+            
+            // Sort by date (newest first)
+            const sortedLog = [...appState.weightLog].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedLog.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'weight-entry';
+                entryDiv.innerHTML = `
+                    <span class="weight-date">${entry.date}</span>: ${entry.weight} kg
+                `;
+                logContainer.appendChild(entryDiv);
+            });
+        }
+        
+        // Update water tracker
+function updateWaterTracker() {
+    const progress = (appState.waterIntake / appState.waterGoal) * 100;
+    document.getElementById('water-fill').style.width = `${Math.min(progress, 100)}%`;
+    document.getElementById('water-count').textContent = appState.waterIntake.toFixed(1);
+    document.getElementById('water-goal-display').textContent = appState.waterGoal;
+    
+    // Log water intake
+    const today = new Date().toISOString().split('T')[0];
+    const existingEntry = appState.waterLog.find(entry => entry.date === today);
+    if (existingEntry) {
+        existingEntry.amount = appState.waterIntake;
+    } else {
+        appState.waterLog.push({
+            date: today,
+            amount: appState.waterIntake
+        });
+    }
+    
+    // Update water chart
+    updateCharts();
+    
+    saveAppState();
+}
+        
+        // Add water
+        document.getElementById('water-plus').addEventListener('click', function() {
+            if (appState.waterIntake < appState.waterGoal) {
+                appState.waterIntake += 0.25;
+                updateWaterTracker();
+                showNotification("Great! Keep hydrating 💧", "success");
+            }
+        });
+        
+        // Remove water
+        document.getElementById('water-minus').addEventListener('click', function() {
+            if (appState.waterIntake > 0) {
+                appState.waterIntake -= 0.25;
+                updateWaterTracker();
+            }
+        });
+        
+        // Load current day meals
+        function loadCurrentDayMeals() {
+            const plan = appState.weeklyMealPlan[appState.currentDay];
+            
+            document.getElementById('breakfast-display').textContent = plan.breakfast.join(', ');
+            document.getElementById('lunch-display').textContent = plan.lunch.join(', ');
+            document.getElementById('dinner-display').textContent = plan.dinner.join(', ');
+        }
+        
+        // Open meal modal
+        function openMealModal(mealType) {
+            currentDay = appState.currentDay;
+            currentMeal = mealType;
+            currentItems = [...appState.weeklyMealPlan[currentDay][mealType]];
+            
+            document.getElementById('modal-title').textContent = `Edit ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}`;
+            renderMealItems();
+            calculateCalories();
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+        
+        // Edit meal from plan tab
+        function editMeal(day, mealType) {
+            currentDay = day;
+            currentMeal = mealType;
+            currentItems = [...appState.weeklyMealPlan[day][mealType]];
+            
+            document.getElementById('modal-title').textContent = `Edit ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} - ${day.charAt(0).toUpperCase() + day.slice(1)}`;
+            renderMealItems();
+            calculateCalories();
+            document.getElementById('edit-modal').style.display = 'block';
+        }
+        
+        // Render meal items in modal
+        function renderMealItems() {
+            const container = document.getElementById('meal-items');
+            container.innerHTML = '';
+            
+            currentItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'meal-item';
+                itemDiv.innerHTML = `
+                    <span>${item}</span>
+                    <button class="delete-btn" onclick="removeItem(${index})">&times;</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+        
+        // Calculate estimated calories
+        function calculateCalories() {
+            let totalCalories = 0;
+            
+            currentItems.forEach(item => {
+                const lowerItem = item.toLowerCase();
+                
+                for (const [food, calories] of Object.entries(foodCalories)) {
+                    if (lowerItem.includes(food)) {
+                        totalCalories += calories;
+                        break;
+                    }
+                }
+            });
+            
+            document.getElementById('calorie-count').textContent = totalCalories;
+        }
+        
+        // Add item to current meal
+        function addItem() {
+            const input = document.getElementById('new-item');
+            const value = input.value.trim();
+            
+            if (value) {
+                currentItems.push(value);
+                input.value = '';
+                renderMealItems();
+                calculateCalories();
+            }
+        }
+        
+        // Add suggestion
+        function addSuggestion(suggestion) {
+            currentItems.push(suggestion);
+            renderMealItems();
+            calculateCalories();
+        }
+        
+        // Remove item from current meal
+        function removeItem(index) {
+            currentItems.splice(index, 1);
+            renderMealItems();
+            calculateCalories();
+        }
+        
+        // Save meal changes
+        // Save meal changes
+        function saveMeal() {
+            if (currentMeal && currentDay) {
+           appState.weeklyMealPlan[currentDay][currentMeal] = [...currentItems];
+        
+        // Update display if it's the current day
+           if (currentDay === appState.currentDay) {
+              const displayElement = document.getElementById(`${currentMeal}-display`);
+              displayElement.textContent = currentItems.join(', ');
+        }
+        
+        // Regenerate the weekly plan to reflect changes
+        generateWeeklyPlan();
+        
+        closeModal();
+        saveAppState();
+        showNotification("Meal updated successfully!", "success");
+    }
+}
+        // Close modal
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+        
+        // Open settings modal
+        function openSettingsModal() {
+            // Populate settings form with current values
+            document.getElementById('profile-name').value = userProfile.name;
+            document.getElementById('profile-height').value = userProfile.height;
+            document.getElementById('profile-starting-weight').value = userProfile.startingWeight;
+            document.getElementById('profile-goal-weight').value = userProfile.goalWeight;
+            document.getElementById('water-goal-input').value = appState.waterGoal;
+            document.getElementById('sound-toggle').checked = appState.soundEnabled;
+            document.getElementById('meal-reminders-toggle').checked = appState.remindersEnabled;
+            
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+        
+        // Close settings modal
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        
+        // Update daily tip
+        function updateDailyTip() {
+            const tips = [
+                "Focus on protein to speed up metabolism",
+                "Drink 3-4 liters of water daily",
+                "Eat dinner before 7:30 PM",
+                "Avoid long fasting periods",
+                "Move for 30 minutes daily",
+                "Choose lean proteins over fatty foods",
+                "Include vegetables in every meal",
+                "Limit injera portions to control carbs",
+                "Start your day with protein",
+                "Snack on fruits and nuts"
+            ];
+            
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            document.getElementById('daily-tip').textContent = randomTip;
+        }
+        
+        // Select day from dropdown
+        function selectDay() {
+            appState.currentDay = document.getElementById('day-selector').value;
+            updateDayDisplay();
+            loadCurrentDayMeals();
+            saveAppState();
+        }
+        
+        // Update day display
+        function updateDayDisplay() {
+            const dayName = appState.currentDay.charAt(0).toUpperCase() + appState.currentDay.slice(1);
+            document.getElementById('current-day-name').textContent = dayName;
+        }
+        
+        // Update charts
+function updateCharts() {
+    // Weight chart
+    const weightChart = document.getElementById('weight-chart');
+    if (!weightChart) return;
+    
+    weightChart.innerHTML = '';
+    
+    // Use last 7 days of weight data or create sample data if none exists
+    let chartData = [];
+    
+    if (appState.weightLog.length > 0) {
+        // Get last 7 entries, or all if less than 7
+        const last7Days = appState.weightLog.slice(-7);
+        chartData = last7Days.map(entry => ({
+            date: entry.date,
+            weight: entry.weight
+        }));
+    } else {
+        // Create sample data for demonstration
+        const today = new Date();
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            chartData.push({
+                date: dateStr,
+                weight: appState.currentWeight
+            });
+        }
+    }
+    
+    if (chartData.length > 0) {
+        const weights = chartData.map(entry => entry.weight);
+        const dates = chartData.map(entry => {
+            const dateObj = new Date(entry.date);
+            return `${dateObj.getDate()}/${dateObj.getMonth() + 1}`;
+        });
+        
+        const maxWeight = Math.max(...weights);
+        const minWeight = Math.min(...weights);
+        const range = maxWeight - minWeight || 100; // Avoid division by zero
+        
+        chartData.forEach((entry, index) => {
+            const barHeight = ((entry.weight - minWeight) / range) * 100;
+            const bar = document.createElement('div');
+            bar.className = 'chart-bar';
+            bar.style.height = `${Math.max(barHeight, 5)}%`; // Minimum 5% height for visibility
+            bar.innerHTML = `
+                <div class="chart-value">${entry.weight.toFixed(1)}</div>
+                <div class="chart-label">${dates[index]}</div>
+            `;
+            weightChart.appendChild(bar);
+        });
+    }
+    
+    // Water chart
+    const waterChart = document.getElementById('water-chart');
+    if (!waterChart) return;
+    
+    waterChart.innerHTML = '';
+    
+    // Use last 7 days of water data
+    const today = new Date();
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const dayWater = appState.waterLog.find(entry => entry.date === dateStr)?.amount || 0;
+        const barHeight = (dayWater / appState.waterGoal) * 100;
+        
+        const bar = document.createElement('div');
+        bar.className = 'chart-bar';
+        bar.style.height = `${Math.max(barHeight, 5)}%`; // Minimum 5% height for visibility
+        bar.innerHTML = `
+            <div class="chart-value">${dayWater.toFixed(1)}L</div>
+            <div class="chart-label">${date.getDate()}/${date.getMonth() + 1}</div>
+        `;
+        waterChart.appendChild(bar);
+    }
+}
+        
+        // Light/Dark mode toggle
+        function toggleMode() {
+            document.body.classList.toggle('dark-mode');
+            const modeBtn = document.getElementById('mode-toggle');
+            if (document.body.classList.contains('dark-mode')) {
+                modeBtn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                modeBtn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Tab navigation - CORRECTED VERSION
+function setupTabNavigation() {
+    const navButtons = document.querySelectorAll('.nav-btn-bottom');
+    
+    navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons and tabs
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Show the selected tab
+            const tabId = this.getAttribute('data-tab');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+        });
+    });
+}
+        
+        // Apply saved theme on load
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('mode-toggle').textContent = '☀️';
+            }
+        }
+        
+        // Handle Enter key in add input
+        document.getElementById('new-item').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addItem();
+            }
+        });
+        
+        // Handle Enter key in weight input
+        document.getElementById('weight-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                updateWeight();
+            }
+        });
+        
+        // Enhanced notification system with sound
+        function showNotification(message, type = "info") {
+            // Play sound if enabled
+            if (appState.soundEnabled) {
+                playNotificationSound();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 90px;
+                right: 20px;
+                padding: 15px;
+                border-radius: 8px;
+                color: white;
+                z-index: 10000;
+                max-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            
+            // Set background color based on type
+            if (type === "success") {
+                notification.style.background = "var(--success)";
+            } else if (type === "error") {
+                notification.style.background = "var(--error)";
+            } else if (type === "warning") {
+                notification.style.background = "var(--warning)";
+            } else {
+                notification.style.background = "var(--secondary)";
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = "translateX(0)";
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = "translateX(400px)";
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Play notification sound
+        function playNotificationSound() {
+            // Create audio context
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.2);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+        
+        // Schedule reminders
+        function scheduleReminders() {
+            if (!appState.remindersEnabled) return;
+            
+            // Check if notifications are supported
+            if (!("Notification" in window)) {
+                return;
+            }
+            
+            // Request permission
+            if (Notification.permission === "default") {
+                Notification.requestPermission();
+            }
+            
+            // Schedule meal reminders (this would be more sophisticated in a real app)
+            const now = new Date();
+            const breakfastTime = new Date();
+            breakfastTime.setHours(8, 0, 0, 0); // 8:00 AM
+            
+            const lunchTime = new Date();
+            lunchTime.setHours(13, 0, 0, 0); // 1:00 PM
+            
+            const dinnerTime = new Date();
+            dinnerTime.setHours(19, 0, 0, 0); // 7:00 PM
+            
+            // Schedule notifications if times are in the future today
+            scheduleNotification(breakfastTime, "🍳 Time for breakfast! Don't forget to log your meal.");
+            scheduleNotification(lunchTime, "🥗 Lunch time! Stay on track with your plan.");
+            scheduleNotification(dinnerTime, "🍽️ Dinner time! Remember to eat before 7:30 PM.");
+        }
+        
+        function scheduleNotification(time, message) {
+            const now = new Date();
+            if (time > now) {
+                const timeout = time.getTime() - now.getTime();
+                setTimeout(() => {
+                    if (Notification.permission === "granted") {
+                        new Notification("Cordavo Reminder", {
+                            body: message,
+                            icon: "/icon.png" // You would add an icon in a real app
+                        });
+                        
+                        // Play sound for reminder
+                        if (appState.soundEnabled) {
+                            playNotificationSound();
+                        }
+                    }
+                }, timeout);
+            }
+        }
+        
+        // Share progress function
+        function shareProgress() {
+            const progress = ((userProfile.startingWeight - appState.currentWeight) / (userProfile.startingWeight - userProfile.goalWeight) * 100).toFixed(1);
+            const message = `I've lost ${(userProfile.startingWeight - appState.currentWeight).toFixed(1)}kg with Cordavo! ${progress}% to my goal weight! 🎉`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Weight Loss Progress',
+                    text: message,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(message).then(() => {
+                    showNotification("Progress copied to clipboard! 📋", "success");
+                });
+            }
+        }
+        
+        // Generate weekly report
+        function generateWeeklyReport() {
+            const today = new Date();
+            const oneWeekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            const weeklyWeights = appState.weightLog.filter(entry => {
+                const entryDate = new Date(entry.date);
+                return entryDate >= oneWeekAgo;
+            });
+            
+            const weeklyWater = appState.waterLog.filter(entry => {
+                const entryDate = new Date(entry.date);
+                return entryDate >= oneWeekAgo;
+            });
+            
+            let weightChange = 0;
+            if (weeklyWeights.length >= 2) {
+                weightChange = weeklyWeights[0].weight - weeklyWeights[weeklyWeights.length - 1].weight;
+            }
+            
+            const avgWater = weeklyWater.length > 0 ? 
+                weeklyWater.reduce((sum, entry) => sum + entry.amount, 0) / weeklyWater.length : 0;
+            
+            const report = `Weekly Report:
+• Weight change: ${weightChange > 0 ? '+' : ''}${weightChange.toFixed(1)}kg
+• Average water intake: ${avgWater.toFixed(1)}L / ${appState.waterGoal}L
+• Days tracked: ${weeklyWeights.length}/7
+            
+Keep up the great work! 💪`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Weekly Cordavo Report',
+                    text: report
+                });
+            } else {
+                navigator.clipboard.writeText(report).then(() => {
+                    showNotification("Weekly report copied to clipboard! 📋", "success");
+                });
+            }
+        }
+        
+        // Update water goal
+        function updateWaterGoal() {
+            const input = document.getElementById('water-goal-input');
+            const newGoal = parseFloat(input.value);
+            
+            if (newGoal && newGoal >= 1 && newGoal <= 10) {
+                appState.waterGoal = newGoal;
+                updateWaterTracker();
+                showNotification(`Water goal updated to ${newGoal}L`, "success");
+                saveAppState();
+            }
+        }
+        
+        // Export data
+        function exportData() {
+            const dataToExport = {
+                profile: userProfile,
+                appState: appState
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "cordavo_data.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            showNotification("Data exported successfully!", "success");
+        }
+        
+        // Import data
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        // Update app state with imported data
+                        if (importedData.profile) userProfile = importedData.profile;
+                        if (importedData.appState) appState = importedData.appState;
+                        
+                        // Save to localStorage
+                        saveProfile();
+                        saveAppState();
+                        
+                        // Update UI
+                        updateUI();
+                        
+                        showNotification("Data imported successfully!", "success");
+                    } catch (error) {
+                        showNotification("Error importing data", "error");
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
+        }
+        
+        // Reset data
+        function resetData() {
+            if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
+                localStorage.removeItem('cordavoProfile');
+                localStorage.removeItem('cordavoAppState');
+                location.reload();
+            }
+        }
+        
+        // Load settings
+        function loadSettings() {
+            document.getElementById('sound-toggle').checked = appState.soundEnabled;
+            document.getElementById('meal-reminders-toggle').checked = appState.remindersEnabled;
+            document.getElementById('water-goal-input').value = appState.waterGoal;
+        }
+        
+        // Update settings when toggles change
+        document.getElementById('sound-toggle').addEventListener('change', function() {
+            appState.soundEnabled = this.checked;
+            saveAppState();
+        });
+        
+        document.getElementById('meal-reminders-toggle').addEventListener('change', function() {
+            appState.remindersEnabled = this.checked;
+            saveAppState();
+            if (appState.remindersEnabled) {
+                scheduleReminders();
+            }
+        });
+        
+        // Update water goal when changed
+        document.getElementById('water-goal-input').addEventListener('change', function() {
+            updateWaterGoal();
+        });
+
+        // PWA Installation
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'block';
+        });
+
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installButton.style.display = 'none';
+                    showNotification('App installed successfully!', 'success');
+                }
+                deferredPrompt = null;
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
+        // Initialize the app when page loads
+        window.onload = function() {
+            applySavedTheme();
+            document.getElementById('mode-toggle').addEventListener('click', toggleMode);
+            document.getElementById('settings-toggle').addEventListener('click', openSettingsModal);
+            initApp();
+        };
+    </script>
+</body>
+</html>
