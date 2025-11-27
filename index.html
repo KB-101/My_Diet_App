@@ -3,827 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diet-Plan</title>
+    <title>Diet-Plan</title>
 
-<!-- PWA Meta Tags -->
-<meta name="theme-color" content="#2E7D32">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Diet-Plan">
-<link rel="apple-touch-icon" href="icons/icon-192x192.png">
-<link rel="icon" type="image/png" href="icons/icon-192x192.png">
-<link rel="manifest" href="manifest.json">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2E7D32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Diet-Plan">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="icon" type="image/png" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
     <style>
-        :root {
-            --primary: #4CAF50;
-            --primary-dark: #2E7D32;
-            --secondary: #2196F3;
-            --background: #f5f7fa;
-            --surface: #ffffff;
-            --text: #333333;
-            --text-secondary: #666666;
-            --border: #e0e0e0;
-            --success: #4CAF50;
-            --warning: #FF9800;
-            --error: #f44336;
-            --shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-        
-        .dark-mode {
-            --primary: #66BB6A;
-            --primary-dark: #388E3C;
-            --secondary: #42A5F5;
-            --background: #121212;
-            --surface: #1e1e1e;
-            --text: #e0e0e0;
-            --text-secondary: #9e9e9e;
-            --border: #424242;
-            --shadow: 0 3px 10px rgba(0,0,0,0.3);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-        
-        body {
-            background: var(--background);
-            color: var(--text);
-            line-height: 1.5;
-            padding: 0;
-            margin: 0;
-            min-height: 100vh;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 15px;
-            padding-top: 90px; /* Space for sticky header */
-            padding-bottom: 80px; /* Space for bottom navigation */
-        }
-        
-        header {
-            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            padding: 20px 15px;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-        
-        .header-controls {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .mode-toggle, .settings-toggle {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .progress-section {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .progress-container {
-            margin: 15px 0;
-        }
-        
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
-        
-        .progress-bar {
-            height: 12px;
-            background: var(--border);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
-            border-radius: 6px;
-            transition: width 0.3s ease;
-        }
-        
-        .water-tracker {
-            background: #e3f2fd;
-            border-radius: 10px;
-            padding: 12px;
-            margin: 10px 0;
-            text-align: center;
-        }
-        
-        .dark-mode .water-tracker {
-            background: #1a237e;
-        }
-        
-        .current-day {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .meal-section {
-            background: var(--surface);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .meal-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 8px 0;
-            cursor: pointer;
-            border-left: 3px solid var(--primary);
-        }
-        
-        .dark-mode .meal-card {
-            background: #2d2d2d;
-        }
-        
-        .meal-card h4 {
-            color: var(--primary-dark);
-            margin-bottom: 5px;
-        }
-        
-        .meal-card p {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-        }
-        
-        .edit-modal, .settings-modal, .profile-setup-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .modal-content {
-            background: var(--surface);
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .close-btn {
-            background: var(--error);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        
-        .meal-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            background: #f9f9f9;
-            border-radius: 6px;
-            margin: 5px 0;
-        }
-        
-        .dark-mode .meal-item {
-            background: #2d2d2d;
-        }
-        
-        .delete-btn {
-            background: var(--error);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .add-form {
-            display: flex;
-            margin-top: 10px;
-        }
-        
-        .add-input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px 0 0 4px;
-            background: var(--surface);
-            color: var(--text);
-        }
-        
-        .add-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-        }
-        
-        .save-btn {
-            background: var(--primary-dark);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            width: 100%;
-            margin-top: 15px;
-            cursor: pointer;
-        }
-        
-        .tips-section {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: var(--shadow);
-        }
-        
-        .tip-card {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 10px 0;
-            font-size: 0.9em;
-        }
-        
-        .dark-mode .tip-card {
-            background: #332701;
-            border-color: #ff9800;
-        }
-        
-        .section-title {
-            font-size: 1.1em;
-            color: var(--primary-dark);
-            margin: 10px 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 2px solid var(--primary);
-        }
-        
-        .water-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .water-progress {
-            flex: 1;
-            height: 20px;
-            background: var(--border);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 0 10px;
-        }
-        
-        .water-fill {
-            height: 100%;
-            background: var(--secondary);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-        
-        .water-controls {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .water-btn {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-        
-        .weight-input {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .weight-input input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: var(--surface);
-            color: var(--text);
-        }
-        
-        .weight-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .week-nav {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-        }
-        
-        .day-selector {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        .weekly-plan {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .day-plan {
-            background: var(--surface);
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: var(--shadow);
-        }
-        
-        .day-plan h4 {
-            color: var(--primary-dark);
-            margin-bottom: 8px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .day-plan-item {
-            padding: 5px 0;
-            font-size: 0.85em;
-            cursor: pointer;
-        }
-        
-        .progress-chart {
-            height: 200px;
-            background: var(--surface);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px 0;
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            border: 1px solid var(--border);
-        }
-        
-        .chart-bar {
-            width: 20px;
-            background: var(--primary);
-            margin: 0 5px;
-            border-radius: 4px 4px 0 0;
-            position: relative;
-        }
-        
-        .chart-label {
-            position: absolute;
-            bottom: -20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 0.7em;
-        }
-        
-        .chart-value {
-            position: absolute;
-            top: -20px;
-            left: 0;
-            width: 100%;
-            text-align: center;
-            font-size: 0.7em;
-        }
-        
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface);
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            border-top: 1px solid var(--border);
-        }
-        
-        .nav-btn-bottom {
-            flex: 1;
-            text-align: center;
-            padding: 10px;
-            color: var(--text);
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        
-        .nav-btn-bottom.active {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .food-list {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 8px 0;
-        }
-        
-        .dark-mode .food-list {
-            background: #2d2d2d;
-        }
-        
-        .food-list h4 {
-            color: var(--primary-dark);
-            margin-bottom: 5px;
-        }
-        
-        .food-list ul {
-            padding-left: 15px;
-        }
-        
-        .food-list li {
-            margin: 3px 0;
-            font-size: 0.85em;
-        }
-        
-        .suggestions {
-            margin-top: 10px;
-        }
-        
-        .suggestion-item {
-            display: inline-block;
-            background: #e8f5e9;
-            color: var(--primary-dark);
-            padding: 4px 8px;
-            margin: 2px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            cursor: pointer;
-        }
-        
-        .dark-mode .suggestion-item {
-            background: #1b5e20;
-            color: white;
-        }
-        
-        .calorie-estimator {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 0.9em;
-        }
-        
-        .dark-mode .calorie-estimator {
-            background: #332701;
-            border-color: #ff9800;
-        }
-        
-        .weight-log {
-            background: var(--surface);
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .weight-entry {
-            padding: 5px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .weight-date {
-            font-weight: bold;
-            color: var(--primary-dark);
-        }
-        
-        .share-section {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        
-        .share-btn {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        
-        .settings-option {
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .settings-option:last-child {
-            border-bottom: none;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-            margin-left: 10px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: var(--text);
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: var(--surface);
-            color: var(--text);
-        }
-        
-        .profile-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .profile-info-item {
-            background: #f0f0f0;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .dark-mode .profile-info-item {
-            background: #2d2d2d;
-        }
-        
-        .profile-info-label {
-            font-weight: bold;
-            color: var(--primary-dark);
-            font-size: 0.85em;
-        }
-        
-        .profile-info-value {
-            font-size: 1em;
-            margin-top: 5px;
-        }
-        
-        .setup-welcome {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .setup-welcome h2 {
-            color: var(--primary-dark);
-            margin-bottom: 10px;
-        }
-        /* Bottom Install Button Styles */
-.install-btn {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-    z-index: 1000;
-    display: none;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    animation: pulse 2s infinite;
-    white-space: nowrap;
-}
-
-.install-btn.show {
-    display: flex;
-}
-
-.install-btn:hover {
-    transform: translateX(-50%) translateY(-2px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-    }
-    50% {
-        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.7);
-    }
-    100% {
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-    }
-}
-
-/* Mobile optimization for installed app */
-@media (display-mode: standalone) {
-    /* Remove browser UI space */
-    body {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
-    
-    /* Adjust header for notch devices */
-    header {
-        padding-top: max(20px, env(safe-area-inset-top));
-        padding-bottom: 20px;
-    }
-    
-    /* Adjust bottom nav for home indicator */
-    .nav-bar {
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
-    }
-    
-    /* Hide install button when app is installed */
-    .install-btn {
-        display: none !important;
-    }
-}
-
-/* Mobile responsive improvements */
-@media (max-width: 768px) {
-    .install-btn {
-        bottom: 70px;
-        padding: 10px 20px;
-        font-size: 13px;
-    }
-    
-    /* Better touch targets */
-    .meal-card, .nav-btn-bottom, .water-btn, .weight-btn {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-    }
-    
-    /* Improve button sizing */
-    .water-btn, .delete-btn, .close-btn {
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    /* Better form inputs */
-    .add-input, .weight-input input, .form-group input {
-        min-height: 44px;
-        font-size: 16px; /* Prevents zoom on iOS */
-    }
-    
-    /* Adjust modal for mobile */
-    .modal-content {
-        margin: 20px auto;
-        width: 95%;
-        max-height: 85vh;
-    }
-}
-
-/* Prevent body scroll when modal is open */
-body.modal-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
+        /* ... (keep all your existing CSS styles) ... */
     </style>
 </head>
 <body>
@@ -835,70 +27,12 @@ body.modal-open {
                 <button class="mode-toggle" id="mode-toggle">🌙</button>
             </div>
         </header>
-  
+
         <!-- Home Tab -->
         <div id="home-tab" class="tab-content active">
+            <!-- ... (keep all your existing HTML structure) ... -->
+            
             <div class="progress-section">
-                <h2 class="section-title">📊 Weight Progress</h2>
-                <div class="progress-container">
-                    <div class="progress-header">
-                        <span>Progress: <span id="current-progress">0%</span></span>
-                        <span><span id="current-weight">0</span>kg → <span id="goal-weight">0</span>kg</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p style="text-align: center; margin-top: 8px; font-size: 0.9em;">
-                        <span id="remaining-weight">0</span>kg to go
-                    </p>
-                </div>
-                <div class="profile-info-grid">
-                    <div class="profile-info-item">
-                        <div class="profile-info-label">Height</div>
-                        <div class="profile-info-value" id="height-display">0 cm</div>
-                    </div>
-                    <div class="profile-info-item">
-                        <div class="profile-info-label">Current</div>
-                        <div class="profile-info-value" id="current-weight-display">0 kg</div>
-                    </div>
-                    <div class="profile-info-item">
-                        <div class="profile-info-label">Goal</div>
-                        <div class="profile-info-value" id="goal-weight-display">0 kg</div>
-                    </div>
-                    <div class="profile-info-item">
-                        <div class="profile-info-label">Target</div>
-                        <div class="profile-info-value" id="target-weight-display">0 kg</div>
-                    </div>
-                </div>
-                <div class="weight-input">
-                    <input type="number" id="weight-input" placeholder="Enter current weight" step="0.1">
-                    <button class="weight-btn" onclick="updateWeight()">Update</button>
-                </div>
-            </div>
-            
-            <div class="current-day">
-                <h2 class="section-title">📅 Today: <span id="current-day-name">Wednesday</span></h2>
-            </div>
-            
-            <div class="meal-section">
-                <h2 class="section-title">🍳 Today's Meals</h2>
-                <div class="meal-card" onclick="openMealModal('breakfast')">
-                    <h4>Breakfast</h4>
-                    <p id="breakfast-display">Loading...</p>
-                </div>
-                
-                <div class="meal-card" onclick="openMealModal('lunch')">
-                    <h4>Lunch</h4>
-                    <p id="lunch-display">Loading...</p>
-                </div>
-                
-                <div class="meal-card" onclick="openMealModal('dinner')">
-                    <h4>Dinner</h4>
-                    <p id="dinner-display">Loading...</p>
-                </div>
-            </div>
-            
-             <div class="progress-section">
                 <h2 class="section-title">💧 Water Tracker</h2>
                 <div class="water-tracker">
                     <div class="water-container">
@@ -920,255 +54,10 @@ body.modal-open {
             </div>
         </div>
         
-        <!-- Plan Tab -->
-<div id="plan-tab" class="tab-content">
-    <div class="current-day">
-        <h2 class="section-title">📅 Weekly Meal Plan</h2>
-        <select class="day-selector" id="day-selector" onchange="selectDay()">
-            <option value="monday">Monday</option>
-            <option value="tuesday">Tuesday</option>
-            <option value="wednesday" selected>Wednesday</option>
-            <option value="thursday">Thursday</option>
-            <option value="friday">Friday</option>
-            <option value="saturday">Saturday</option>
-            <option value="sunday">Sunday</option>
-        </select>
+        <!-- ... (keep all your other HTML tabs and modals) ... -->
     </div>
     
-    <div class="weekly-plan" id="weekly-plan-container">
-        <!-- Weekly plan will be generated dynamically here -->
-    </div>
-</div>
-        
-        <!-- Progress Tab -->
-        <div id="progress-tab" class="tab-content">
-            <div class="progress-section">
-                <h2 class="section-title">📊 Weight Progress</h2>
-                <div class="progress-container">
-                    <div class="progress-header">
-                        <span>Progress: <span id="progress-percent">0%</span></span>
-                        <span><span id="current-wt">0</span>kg → <span id="goal-wt">0</span>kg</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="wt-progress-fill" style="width: 0%"></div>
-                    </div>
-                    <p style="text-align: center; margin-top: 8px; font-size: 0.9em;">
-                        <span id="wt-remaining">0</span>kg to go
-                    </p>
-                </div>
-            </div>
-            
-            <div class="progress-section">
-                <h2 class="section-title">📈 Weight Progress Chart</h2>
-                <div class="progress-chart" id="weight-chart">
-                    <!-- Chart will be generated here -->
-                </div>
-            </div>
-            
-            <div class="progress-section">
-                <h2 class="section-title">📊 Water Intake Chart</h2>
-                <div class="progress-chart" id="water-chart">
-                    <!-- Chart will be generated here -->
-                </div>
-            </div>
-            
-            <div class="share-section">
-                <h2 class="section-title">🎉 Share Your Progress</h2>
-                <p>Celebrate your achievements and motivate others!</p>
-                <button class="share-btn" onclick="shareProgress()">Share My Progress</button>
-                <button class="share-btn" onclick="generateWeeklyReport()">Weekly Report</button>
-            </div>
-        </div>
-        
-        <!-- Tips Tab -->
-        <div id="tips-tab" class="tab-content">
-            <div class="tips-section">
-                <h2 class="section-title">💡 Daily Tip</h2>
-                <div class="tip-card" id="daily-tip">
-                    Eat dinner before 7:30 PM to support your slow metabolism
-                </div>
-            </div>
-            
-            <div class="food-list">
-                <h4>✅ Allowed Foods</h4>
-                <ul>
-                    <li>Coffee (no sugar)</li>
-                    <li>Vegetables</li>
-                    <li>Eggs</li>
-                    <li>Lean meats</li>
-                    <li>Ayib</li>
-                    <li>Lentils</li>
-                    <li>Fruits</li>
-                    <li>Nuts</li>
-                </ul>
-            </div>
-            
-            <div class="food-list">
-                <h4>❌ Foods to Avoid</h4>
-                <ul>
-                    <li>Bizu injera</li>
-                    <li>Sugary coffee</li>
-                    <li>Excess bread</li>
-                    <li>Fried foods</li>
-                    <li>Sugary foods</li>
-                    <li>Kibe-heavy dishes</li>
-                    <li>High carb foods</li>
-                    <li>Junk foods</li>
-                </ul>
-            </div>
-            
-            <div class="tips-section">
-                <h2 class="section-title">📋 Healthy Tips</h2>
-                <div class="tip-card">
-                    Focus on protein to speed up metabolism
-                </div>
-                <div class="tip-card">
-                    Drink 3-4 liters of water daily
-                </div>
-                <div class="tip-card">
-                    Eat dinner before 7:30 PM
-                </div>
-                <div class="tip-card">
-                    Avoid long fasting periods
-                </div>
-                <div class="tip-card">
-                    Move for 30 minutes daily
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Edit Meal Modal -->
-    <div class="edit-modal" id="edit-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Edit Meal</h3>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            <div id="meal-items">
-                <!-- Meal items will be populated here -->
-            </div>
-            <div class="add-form">
-                <input type="text" class="add-input" id="new-item" placeholder="Add new item...">
-                <button class="add-btn" onclick="addItem()">+</button>
-            </div>
-            <div class="suggestions">
-                <h4>💡 Ethiopian Food Suggestions:</h4>
-                <span class="suggestion-item" onclick="addSuggestion('2 boiled eggs')">2 boiled eggs</span>
-                <span class="suggestion-item" onclick="addSuggestion('1 cup of coffee (no sugar)')">1 cup coffee</span>
-                <span class="suggestion-item" onclick="addSuggestion('1 injera')">1 injera</span>
-                <span class="suggestion-item" onclick="addSuggestion('Misir wot')">Misir wot</span>
-                <span class="suggestion-item" onclick="addSuggestion('Gomen')">Gomen</span>
-                <span class="suggestion-item" onclick="addSuggestion('Kinche')">Kinche</span>
-                <span class="suggestion-item" onclick="addSuggestion('1 cup of tea')">1 cup tea</span>
-                <span class="suggestion-item" onclick="addSuggestion('Small salad')">Small salad</span>
-            </div>
-            <div class="calorie-estimator">
-                <strong>Estimated Calories:</strong> <span id="calorie-count">0</span> cal
-            </div>
-            <button class="save-btn" onclick="saveMeal()">Save Changes</button>
-        </div>
-    </div>
-    
-    <!-- Settings Modal -->
-    <div class="settings-modal" id="settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="close-btn" onclick="closeSettingsModal()">&times;</button>
-            </div>
-            
-            <div class="settings-option">
-                <h4>Profile</h4>
-                <div class="form-group">
-                    <label for="profile-name">Name</label>
-                    <input type="text" id="profile-name" placeholder="Your name">
-                </div>
-                <div class="form-group">
-                    <label for="profile-height">Height (cm)</label>
-                    <input type="number" id="profile-height" placeholder="Height in cm">
-                </div>
-                <div class="form-group">
-                    <label for="profile-starting-weight">Starting Weight (kg)</label>
-                    <input type="number" id="profile-starting-weight" placeholder="Starting weight" step="0.1">
-                </div>
-                <div class="form-group">
-                    <label for="profile-goal-weight">Goal Weight (kg)</label>
-                    <input type="number" id="profile-goal-weight" placeholder="Goal weight" step="0.1">
-                </div>
-                <button class="save-btn" onclick="saveProfile()">Save Profile</button>
-            </div>
-            
-            <div class="settings-option">
-                <h4>Settings</h4>
-                <div class="form-group">
-                    <label for="water-goal-input">Water Goal (liters)</label>
-                    <input type="number" id="water-goal-input" placeholder="Water goal in liters" step="0.5" min="1" max="10">
-                </div>
-                <label>
-                    Enable Sound Notifications
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="sound-toggle" checked>
-                        <span class="slider"></span>
-                    </div>
-                </label>
-                <label>
-                    Meal Reminders
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="meal-reminders-toggle" checked>
-                        <span class="slider"></span>
-                    </div>
-                </label>
-            </div>
-            
-            <div class="settings-option">
-                <h4>Data Management</h4>
-                <button class="save-btn" onclick="exportData()" style="background: var(--secondary); margin-bottom: 10px;">Export Data</button>
-                <button class="save-btn" onclick="importData()" style="background: var(--warning); margin-bottom: 10px;">Import Data</button>
-                <button class="save-btn" onclick="resetData()" style="background: var(--error);">Reset All Data</button>
-            </div>
-            
-            <div class="settings-option">
-                <h4>About</h4>
-                <p style="font-size: 0.9em; color: var(--text-secondary);">
-                    Diet-Plan v1.0 - Ethiopian Weight Loss Plan<br>
-                    Designed for Someone Special..!, 
-                </p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Profile Setup Modal -->
-    <div class="profile-setup-modal" id="profile-setup-modal">
-        <div class="modal-content">
-            <div class="setup-welcome">
-                <h2>Aytoye..!</h2>
-                <p>Let's set up your personalized weight loss plan</p>
-            </div>
-            
-            <div class="form-group">
-                <label for="setup-name">Your Name</label>
-                <input type="text" id="setup-name" placeholder="Enter your name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="setup-height">Height (cm)</label>
-                <input type="number" id="setup-height" placeholder="Your height in cm" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="setup-starting-weight">Current Weight (kg)</label>
-                <input type="number" id="setup-starting-weight" placeholder="Your current weight" step="0.1" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="setup-goal-weight">Goal Weight (kg)</label>
-                <input type="number" id="setup-goal-weight" placeholder="Your goal weight" step="0.1" required>
-            </div>
-            
-            <button class="save-btn" onclick="completeSetup()">Start My Journey</button>
-        </div>
-    </div>
+    <!-- ... (keep all your modals) ... -->
     
     <div class="nav-bar">
         <button class="nav-btn-bottom active" data-tab="home-tab">🏠 Home</button>
@@ -1180,838 +69,403 @@ body.modal-open {
         <span>📲</span>
         Install App
     </button>
+    
     <script>
         // User Profile
-let userProfile = {
-    name: "",
-    height: 0,
-    startingWeight: 0,
-    goalWeight: 0
-};
-
-// App State
-let appState = {
-    currentWeight: 0,
-    weeklyMealPlan: null,
-    waterIntake: 0,
-    currentDay: 'wednesday',
-    weightLog: [],
-    waterLog: [],
-    waterGoal: 4,
-    soundEnabled: true,
-    remindersEnabled: true
-};
-
-// Default diet plan
-const defaultPlan = {
-    monday: {
-        breakfast: ["2-3 boiled eggs", "1 cup of coffee (no sugar)"],
-        lunch: ["1 injera", "Misir wot", "Gomen", "1 cup of coffee"],
-        dinner: ["Any fruit (apple/orange)", "1 cup of tea"]
-    },
-    tuesday: {
-        breakfast: ["2 boiled eggs", "1 cup coffee"],
-        lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup of coffee"],
-        dinner: ["Water melon or Zaba juice (no sugar)"]
-    },
-    wednesday: {
-        breakfast: ["Full with 2 eggs", "1 cup of coffee"],
-        lunch: ["Kinche with 2 pieces of carrots", "1 cup coffee"],
-        dinner: ["A small salad (lettuce, tomato, onion, lemon)"]
-    },
-    thursday: {
-        breakfast: ["2 eggs + sandwich with grain bread", "1 cup coffee"],
-        lunch: ["1 boiled egg", "2 cups of 'Girgir' + 2 cups of firfir (small portion)", "1 cup coffee"],
-        dinner: ["Banana or extra tea"]
-    },
-    friday: {
-        breakfast: ["Avocado (½ fruit) + banana (½ fruit)", "1 cup coffee"],
-        lunch: ["2 small pieces of potato", "Boiled vegetables", "1 cup coffee"],
-        dinner: ["Water melon or Zaba juice"]
-    },
-    saturday: {
-        breakfast: ["2-3 boiled eggs", "1 cup coffee"],
-        lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup coffee"],
-        dinner: ["Banana or tea"]
-    },
-    sunday: {
-        breakfast: ["2 eggs + 4 small balls of dabo", "1 cup coffee"],
-        lunch: ["1 boiled egg", "2 cups of Girgir", "1 cup coffee"],
-        dinner: ["Banana or tea"]
-    }
-};
-
-// App state for modals
-let currentMeal = null;
-let currentDay = null;
-let currentItems = [];
-
-// Initialize the app
-function initApp() {
-    console.log('Initializing app...');
-    
-    // Load data first
-    loadProfile();
-    loadAppState();
-    
-    // Setup UI components
-    setupTabNavigation();
-    setupEventListeners();
-    
-    // Check if profile is complete
-    if (!userProfile.name || userProfile.name === "") {
-        console.log('No profile found, showing setup');
-        showProfileSetup();
-        return;
-    }
-    
-    // Check and reset water for new day
-    checkAndResetDailyWater();
-    
-    // Update UI
-    updateUI();
-    
-    // Load settings
-    loadSettings();
-    
-    console.log('App initialized successfully');
-}
-
-// Load profile from localStorage
-function loadProfile() {
-    try {
-        const savedProfile = localStorage.getItem('cordavoProfile');
-        if (savedProfile) {
-            userProfile = JSON.parse(savedProfile);
-            console.log('Profile loaded:', userProfile);
-        } else {
-            console.log('No profile found in localStorage');
-        }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        userProfile = { name: "", height: 0, startingWeight: 0, goalWeight: 0 };
-    }
-}
-
-// Load app state from localStorage
-function loadAppState() {
-    try {
-        const savedAppState = localStorage.getItem('cordavoAppState');
-        if (savedAppState) {
-            appState = JSON.parse(savedAppState);
-            console.log('App state loaded');
-        } else {
-            // Initialize with default values
-            appState.weeklyMealPlan = JSON.parse(JSON.stringify(defaultPlan));
-            appState.currentWeight = userProfile.startingWeight || 72;
-            console.log('Using default app state');
-        }
+        let userProfile = {
+            name: "",
+            height: 0,
+            startingWeight: 0,
+            goalWeight: 0
+        };
         
-        // Ensure weeklyMealPlan is always set
-        if (!appState.weeklyMealPlan) {
-            appState.weeklyMealPlan = JSON.parse(JSON.stringify(defaultPlan));
-        }
-    } catch (error) {
-        console.error('Error loading app state:', error);
-        appState = {
-            currentWeight: userProfile.startingWeight || 72,
-            weeklyMealPlan: JSON.parse(JSON.stringify(defaultPlan)),
+        // App State
+        let appState = {
+            currentWeight: 0,
+            weeklyMealPlan: null,
             waterIntake: 0,
             currentDay: 'wednesday',
             weightLog: [],
             waterLog: [],
             waterGoal: 4,
             soundEnabled: true,
-            remindersEnabled: true
+            remindersEnabled: true,
+            lastWaterReset: null // Track when water was last reset
         };
-    }
-}
-
-// Setup all event listeners
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
-    // Water buttons
-    const waterPlus = document.getElementById('water-plus');
-    const waterMinus = document.getElementById('water-minus');
-    
-    if (waterPlus) {
-        waterPlus.addEventListener('click', function() {
-            if (appState.waterIntake < appState.waterGoal) {
-                appState.waterIntake += 0.25;
-                updateWaterTracker();
-                showNotification("Great! Keep hydrating 💧", "success");
+        
+        // Current modal state
+        let currentMeal = null;
+        let currentDay = null;
+        let currentItems = [];
+        
+        // Default diet plan
+        const defaultPlan = {
+            monday: {
+                breakfast: ["2-3 boiled eggs", "1 cup of coffee (no sugar)"],
+                lunch: ["1 injera", "Misir wot", "Gomen", "1 cup of coffee"],
+                dinner: ["Any fruit (apple/orange)", "1 cup of tea"]
+            },
+            tuesday: {
+                breakfast: ["2 boiled eggs", "1 cup coffee"],
+                lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup of coffee"],
+                dinner: ["Water melon or Zaba juice (no sugar)"]
+            },
+            wednesday: {
+                breakfast: ["Full with 2 eggs", "1 cup of coffee"],
+                lunch: ["Kinche with 2 pieces of carrots", "1 cup coffee"],
+                dinner: ["A small salad (lettuce, tomato, onion, lemon)"]
+            },
+            thursday: {
+                breakfast: ["2 eggs + sandwich with grain bread", "1 cup coffee"],
+                lunch: ["1 boiled egg", "2 cups of 'Girgir' + 2 cups of firfir (small portion)", "1 cup coffee"],
+                dinner: ["Banana or extra tea"]
+            },
+            friday: {
+                breakfast: ["Avocado (½ fruit) + banana (½ fruit)", "1 cup coffee"],
+                lunch: ["2 small pieces of potato", "Boiled vegetables", "1 cup coffee"],
+                dinner: ["Water melon or Zaba juice"]
+            },
+            saturday: {
+                breakfast: ["2-3 boiled eggs", "1 cup coffee"],
+                lunch: ["Tilet fitfit OR Duba fitfit (small portion)", "1 cup coffee"],
+                dinner: ["Banana or tea"]
+            },
+            sunday: {
+                breakfast: ["2 eggs + 4 small balls of dabo", "1 cup coffee"],
+                lunch: ["1 boiled egg", "2 cups of Girgir", "1 cup coffee"],
+                dinner: ["Banana or tea"]
             }
-        });
-    }
-    
-    if (waterMinus) {
-        waterMinus.addEventListener('click', function() {
-            if (appState.waterIntake > 0) {
-                appState.waterIntake -= 0.25;
-                updateWaterTracker();
-            }
-        });
-    }
-    
-    // Settings button
-    const settingsToggle = document.getElementById('settings-toggle');
-    if (settingsToggle) {
-        settingsToggle.addEventListener('click', openSettingsModal);
-        console.log('Settings button listener attached');
-    } else {
-        console.error('Settings button not found!');
-    }
-    
-    // Enter key handlers
-    const newItemInput = document.getElementById('new-item');
-    if (newItemInput) {
-        newItemInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addItem();
-            }
-        });
-    }
-    
-    const weightInput = document.getElementById('weight-input');
-    if (weightInput) {
-        weightInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                updateWeight();
-            }
-        });
-    }
-    
-    // Settings toggles
-    const soundToggle = document.getElementById('sound-toggle');
-    if (soundToggle) {
-        soundToggle.addEventListener('change', function() {
-            appState.soundEnabled = this.checked;
-            saveAppState();
-        });
-    }
-    
-    const remindersToggle = document.getElementById('meal-reminders-toggle');
-    if (remindersToggle) {
-        remindersToggle.addEventListener('change', function() {
-            appState.remindersEnabled = this.checked;
-            saveAppState();
-        });
-    }
-    
-    const waterGoalInput = document.getElementById('water-goal-input');
-    if (waterGoalInput) {
-        waterGoalInput.addEventListener('change', function() {
-            updateWaterGoal();
-        });
-    }
-    
-    console.log('Event listeners setup complete');
-}
-
-// Update the entire UI
-function updateUI() {
-    console.log('Updating UI...');
-    updateHeader();
-    updateProgress();
-    updateWaterTracker();
-    updateDailyTip();
-    loadCurrentDayMeals();
-    updateDayDisplay();
-    updateWeightLog();
-    updateCharts();
-    generateWeeklyPlan();
-    console.log('UI update complete');
-}
-
-// Update header with user's name
-function updateHeader() {
-    const userHeader = document.getElementById('user-header');
-    if (userHeader) {
-        userHeader.textContent = "👤 " + (userProfile.name || "User");
-    }
-}
-
-// Update progress bar
-function updateProgress() {
-    const totalWeightLoss = userProfile.startingWeight - userProfile.goalWeight;
-    const currentLoss = userProfile.startingWeight - appState.currentWeight;
-    const progress = totalWeightLoss > 0 ? (currentLoss / totalWeightLoss) * 100 : 0;
-    
-    // Update home tab progress
-    const progressFill = document.getElementById('progress-fill');
-    const currentProgress = document.getElementById('current-progress');
-    const currentWeight = document.getElementById('current-weight');
-    const goalWeight = document.getElementById('goal-weight');
-    const remainingWeight = document.getElementById('remaining-weight');
-    
-    if (progressFill) progressFill.style.width = `${Math.min(progress, 100)}%`;
-    if (currentProgress) currentProgress.textContent = `${Math.round(progress)}%`;
-    if (currentWeight) currentWeight.textContent = appState.currentWeight.toFixed(1);
-    if (goalWeight) goalWeight.textContent = userProfile.goalWeight;
-    if (remainingWeight) remainingWeight.textContent = (userProfile.startingWeight - appState.currentWeight).toFixed(1);
-    
-    // Update profile info grid
-    const heightDisplay = document.getElementById('height-display');
-    const currentWeightDisplay = document.getElementById('current-weight-display');
-    const goalWeightDisplay = document.getElementById('goal-weight-display');
-    const targetWeightDisplay = document.getElementById('target-weight-display');
-    
-    if (heightDisplay) heightDisplay.textContent = `${userProfile.height} cm`;
-    if (currentWeightDisplay) currentWeightDisplay.textContent = `${appState.currentWeight.toFixed(1)} kg`;
-    if (goalWeightDisplay) goalWeightDisplay.textContent = `${userProfile.goalWeight} kg`;
-    if (targetWeightDisplay) targetWeightDisplay.textContent = `${(userProfile.startingWeight - userProfile.goalWeight).toFixed(1)} kg`;
-    
-    // Update progress tab
-    const wtProgressFill = document.getElementById('wt-progress-fill');
-    const progressPercent = document.getElementById('progress-percent');
-    const currentWt = document.getElementById('current-wt');
-    const goalWt = document.getElementById('goal-wt');
-    const wtRemaining = document.getElementById('wt-remaining');
-    
-    if (wtProgressFill) wtProgressFill.style.width = `${Math.min(progress, 100)}%`;
-    if (progressPercent) progressPercent.textContent = `${Math.round(progress)}%`;
-    if (currentWt) currentWt.textContent = appState.currentWeight.toFixed(1);
-    if (goalWt) goalWt.textContent = userProfile.goalWeight;
-    if (wtRemaining) wtRemaining.textContent = (userProfile.startingWeight - appState.currentWeight).toFixed(1);
-    
-    saveAppState();
-}
-
-// Check and reset water intake for new day
-function checkAndResetDailyWater() {
-    const today = new Date().toISOString().split('T')[0];
-    const lastReset = localStorage.getItem('lastWaterReset');
-    
-    // If it's a new day, reset water intake
-    if (lastReset !== today) {
-        appState.waterIntake = 0;
-        localStorage.setItem('lastWaterReset', today);
-        updateWaterTracker();
+        };
         
-        // Only show notification if user had water intake yesterday
-        if (lastReset) {
-            showNotification("New day! Water tracker has been reset 💧", "info");
-        }
-    }
-}
+        // Food calorie estimates (keep as is)
+        const foodCalories = {
+            'boiled eggs': 70, // per egg
+            'coffee': 2, // per cup
+            'injera': 100, // per piece
+            'misir wot': 150, // per serving
+            'gomen': 80, // per serving
+            'kinche': 200, // per serving
+            'carrots': 40, // per serving
+            'tea': 2, // per cup
+            'fruit': 80, // per piece
+            'salad': 50, // per serving
+            'banana': 105, // per fruit
+            'zaba juice': 120, // per glass
+            'potato': 160, // per serving
+            'vegetables': 50, // per serving
+            'dabo': 150, // per 4 balls
+            'girgir': 200, // per serving
+            'fifir': 180, // per serving
+            'avocado': 240, // per ½ fruit
+            'sandwich': 300 // per sandwich
+        };
 
-// Update water tracker
-function updateWaterTracker() {
-    const progress = (appState.waterIntake / appState.waterGoal) * 100;
-    const waterFill = document.getElementById('water-fill');
-    const waterCount = document.getElementById('water-count');
-    const waterGoalDisplay = document.getElementById('water-goal-display');
-    
-    if (waterFill) waterFill.style.width = `${Math.min(progress, 100)}%`;
-    if (waterCount) waterCount.textContent = appState.waterIntake.toFixed(1);
-    if (waterGoalDisplay) waterGoalDisplay.textContent = appState.waterGoal;
-    
-    // Log water intake for current day
-    const today = new Date().toISOString().split('T')[0];
-    const existingEntryIndex = appState.waterLog.findIndex(entry => entry.date === today);
-    
-    if (existingEntryIndex !== -1) {
-        appState.waterLog[existingEntryIndex].amount = appState.waterIntake;
-    } else {
-        appState.waterLog.push({
-            date: today,
-            amount: appState.waterIntake
-        });
-    }
-    
-    // Keep only last 30 days of data
-    if (appState.waterLog.length > 30) {
-        appState.waterLog = appState.waterLog.slice(-30);
-    }
-    
-    updateCharts();
-    saveAppState();
-}
-
-// Load current day meals
-function loadCurrentDayMeals() {
-    const plan = appState.weeklyMealPlan[appState.currentDay];
-    
-    const breakfastDisplay = document.getElementById('breakfast-display');
-    const lunchDisplay = document.getElementById('lunch-display');
-    const dinnerDisplay = document.getElementById('dinner-display');
-    
-    if (breakfastDisplay) breakfastDisplay.textContent = plan.breakfast.join(', ');
-    if (lunchDisplay) lunchDisplay.textContent = plan.lunch.join(', ');
-    if (dinnerDisplay) dinnerDisplay.textContent = plan.dinner.join(', ');
-}
-
-// Generate weekly meal plan display
-function generateWeeklyPlan() {
-    const container = document.getElementById('weekly-plan-container');
-    if (!container) return;
-    
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    
-    container.innerHTML = '';
-    
-    days.forEach(day => {
-        const dayPlan = appState.weeklyMealPlan[day];
-        const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1);
-        
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'day-plan';
-        dayDiv.innerHTML = `
-            <h4>${dayCapitalized}</h4>
-            <div class="day-plan-item" onclick="editMeal('${day}', 'breakfast')">Breakfast: ${dayPlan.breakfast.join(', ')}</div>
-            <div class="day-plan-item" onclick="editMeal('${day}', 'lunch')">Lunch: ${dayPlan.lunch.join(', ')}</div>
-            <div class="day-plan-item" onclick="editMeal('${day}', 'dinner')">Dinner: ${dayPlan.dinner.join(', ')}</div>
-        `;
-        
-        container.appendChild(dayDiv);
-    });
-}
-
-// MODAL FUNCTIONS - FIXED
-
-// Open settings modal - FIXED VERSION
-function openSettingsModal() {
-    console.log('Opening settings modal...');
-    
-    // Populate settings form with current values
-    const profileName = document.getElementById('profile-name');
-    const profileHeight = document.getElementById('profile-height');
-    const profileStartingWeight = document.getElementById('profile-starting-weight');
-    const profileGoalWeight = document.getElementById('profile-goal-weight');
-    const waterGoalInput = document.getElementById('water-goal-input');
-    const soundToggle = document.getElementById('sound-toggle');
-    const remindersToggle = document.getElementById('meal-reminders-toggle');
-    
-    if (profileName) profileName.value = userProfile.name || "";
-    if (profileHeight) profileHeight.value = userProfile.height || "";
-    if (profileStartingWeight) profileStartingWeight.value = userProfile.startingWeight || "";
-    if (profileGoalWeight) profileGoalWeight.value = userProfile.goalWeight || "";
-    if (waterGoalInput) waterGoalInput.value = appState.waterGoal || 4;
-    if (soundToggle) soundToggle.checked = appState.soundEnabled;
-    if (remindersToggle) remindersToggle.checked = appState.remindersEnabled;
-    
-    // Show the modal
-    const settingsModal = document.getElementById('settings-modal');
-    if (settingsModal) {
-        settingsModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-        console.log('Settings modal opened successfully');
-    } else {
-        console.error('Settings modal element not found!');
-    }
-}
-
-// Close settings modal
-function closeSettingsModal() {
-    const settingsModal = document.getElementById('settings-modal');
-    if (settingsModal) {
-        settingsModal.style.display = 'none';
-        document.body.classList.remove('modal-open');
-    }
-}
-
-// Open meal modal
-function openMealModal(mealType) {
-    currentDay = appState.currentDay;
-    currentMeal = mealType;
-    currentItems = [...appState.weeklyMealPlan[currentDay][mealType]];
-    
-    document.getElementById('modal-title').textContent = `Edit ${mealType.charAt(0).toUpperCase() + mealType.slice(1)}`;
-    renderMealItems();
-    calculateCalories();
-    
-    const editModal = document.getElementById('edit-modal');
-    if (editModal) {
-        editModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-    }
-}
-
-// Edit meal from plan tab
-function editMeal(day, mealType) {
-    currentDay = day;
-    currentMeal = mealType;
-    currentItems = [...appState.weeklyMealPlan[day][mealType]];
-    
-    document.getElementById('modal-title').textContent = `Edit ${mealType.charAt(0).toUpperCase() + mealType.slice(1)} - ${day.charAt(0).toUpperCase() + day.slice(1)}`;
-    renderMealItems();
-    calculateCalories();
-    
-    const editModal = document.getElementById('edit-modal');
-    if (editModal) {
-        editModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-    }
-}
-
-// Close modal
-function closeModal() {
-    const editModal = document.getElementById('edit-modal');
-    if (editModal) {
-        editModal.style.display = 'none';
-    }
-    document.body.classList.remove('modal-open');
-}
-
-// Render meal items in modal
-function renderMealItems() {
-    const container = document.getElementById('meal-items');
-    if (!container) return;
-    
-    container.innerHTML = '';
-    
-    currentItems.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'meal-item';
-        itemDiv.innerHTML = `
-            <span>${item}</span>
-            <button class="delete-btn" onclick="removeItem(${index})">&times;</button>
-        `;
-        container.appendChild(itemDiv);
-    });
-}
-
-// Calculate estimated calories
-function calculateCalories() {
-    // Simple calorie calculation - you can enhance this later
-    const calorieCount = document.getElementById('calorie-count');
-    if (calorieCount) {
-        calorieCount.textContent = currentItems.length * 150; // Simple estimate
-    }
-}
-
-// Add item to current meal
-function addItem() {
-    const input = document.getElementById('new-item');
-    if (!input) return;
-    
-    const value = input.value.trim();
-    if (value) {
-        currentItems.push(value);
-        input.value = '';
-        renderMealItems();
-        calculateCalories();
-    }
-}
-
-// Add suggestion
-function addSuggestion(suggestion) {
-    currentItems.push(suggestion);
-    renderMealItems();
-    calculateCalories();
-}
-
-// Remove item from current meal
-function removeItem(index) {
-    currentItems.splice(index, 1);
-    renderMealItems();
-    calculateCalories();
-}
-
-// Save meal changes
-function saveMeal() {
-    if (currentMeal && currentDay) {
-        appState.weeklyMealPlan[currentDay][currentMeal] = [...currentItems];
-        
-        // Update display if it's the current day
-        if (currentDay === appState.currentDay) {
-            const displayElement = document.getElementById(`${currentMeal}-display`);
-            if (displayElement) {
-                displayElement.textContent = currentItems.join(', ');
-            }
-        }
-        
-        generateWeeklyPlan();
-        closeModal();
-        saveAppState();
-        showNotification("Meal updated successfully!", "success");
-    }
-}
-
-// Save profile
-function saveProfile() {
-    const profileName = document.getElementById('profile-name');
-    const profileHeight = document.getElementById('profile-height');
-    const profileStartingWeight = document.getElementById('profile-starting-weight');
-    const profileGoalWeight = document.getElementById('profile-goal-weight');
-    
-    if (profileName && profileHeight && profileStartingWeight && profileGoalWeight) {
-        userProfile.name = profileName.value.trim();
-        userProfile.height = parseFloat(profileHeight.value) || 0;
-        userProfile.startingWeight = parseFloat(profileStartingWeight.value) || 0;
-        userProfile.goalWeight = parseFloat(profileGoalWeight.value) || 0;
-        
-        // Validate goal weight
-        if (userProfile.goalWeight >= userProfile.startingWeight) {
-            showNotification("Goal weight should be less than starting weight", "error");
-            return;
-        }
-        
-        localStorage.setItem('cordavoProfile', JSON.stringify(userProfile));
-        updateUI();
-        closeSettingsModal();
-        showNotification("Profile updated successfully!", "success");
-    }
-}
-
-// Update weight
-function updateWeight() {
-    const input = document.getElementById('weight-input');
-    if (!input) return;
-    
-    const newWeight = parseFloat(input.value);
-    
-    if (newWeight && newWeight > 0 && newWeight <= userProfile.startingWeight) {
-        appState.currentWeight = newWeight;
-        
-        // Add to weight log
-        const today = new Date().toISOString().split('T')[0];
-        appState.weightLog.push({
-            date: today,
-            weight: newWeight
-        });
-        
-        updateProgress();
-        updateWeightLog();
-        updateCharts();
-        input.value = '';
-        
-        showNotification("Weight updated successfully!", "success");
-    } else if (newWeight) {
-        showNotification("Please enter a valid weight (0 < weight ≤ starting weight)", "error");
-    }
-}
-
-// Update water goal
-function updateWaterGoal() {
-    const input = document.getElementById('water-goal-input');
-    if (!input) return;
-    
-    const newGoal = parseFloat(input.value);
-    
-    if (newGoal && newGoal >= 1 && newGoal <= 10) {
-        appState.waterGoal = newGoal;
-        updateWaterTracker();
-        showNotification(`Water goal updated to ${newGoal}L`, "success");
-        saveAppState();
-    }
-}
-
-// Load settings
-function loadSettings() {
-    const soundToggle = document.getElementById('sound-toggle');
-    const remindersToggle = document.getElementById('meal-reminders-toggle');
-    const waterGoalInput = document.getElementById('water-goal-input');
-    
-    if (soundToggle) soundToggle.checked = appState.soundEnabled;
-    if (remindersToggle) remindersToggle.checked = appState.remindersEnabled;
-    if (waterGoalInput) waterGoalInput.value = appState.waterGoal;
-}
-
-// Save app state to localStorage
-function saveAppState() {
-    try {
-        localStorage.setItem('cordavoAppState', JSON.stringify(appState));
-    } catch (error) {
-        console.error('Error saving app state:', error);
-    }
-}
-
-// Show profile setup modal
-function showProfileSetup() {
-    const profileSetupModal = document.getElementById('profile-setup-modal');
-    if (profileSetupModal) {
-        profileSetupModal.style.display = 'block';
-    }
-}
-
-// Complete profile setup
-function completeSetup() {
-    const setupName = document.getElementById('setup-name');
-    const setupHeight = document.getElementById('setup-height');
-    const setupStartingWeight = document.getElementById('setup-starting-weight');
-    const setupGoalWeight = document.getElementById('setup-goal-weight');
-    
-    if (setupName && setupHeight && setupStartingWeight && setupGoalWeight) {
-        const name = setupName.value.trim();
-        const height = parseFloat(setupHeight.value);
-        const startingWeight = parseFloat(setupStartingWeight.value);
-        const goalWeight = parseFloat(setupGoalWeight.value);
-        
-        if (name && height && startingWeight && goalWeight) {
-            if (goalWeight >= startingWeight) {
-                showNotification("Goal weight should be less than starting weight", "error");
+        // Initialize the app
+        function initApp() {
+            loadProfile();
+            loadAppState();
+            
+            // Set up tab navigation
+            setupTabNavigation();
+            
+            // Check if profile is complete
+            if (!userProfile.name) {
+                showProfileSetup();
                 return;
-            }
+            } 
             
-            userProfile.name = name;
-            userProfile.height = height;
-            userProfile.startingWeight = startingWeight;
-            userProfile.goalWeight = goalWeight;
+            // Check and reset water for new day - MUST be called before setting up event listeners
+            checkAndResetDailyWater();
             
-            appState.currentWeight = startingWeight;
-            
-            saveProfile();
-            saveAppState();
-            
-            const profileSetupModal = document.getElementById('profile-setup-modal');
-            if (profileSetupModal) {
-                profileSetupModal.style.display = 'none';
-            }
+            // Initialize water buttons - FIXED: Proper event listener setup
+            setupWaterEventListeners();
             
             updateUI();
-            showNotification("Welcome to Cordavo, " + name + "!", "success");
-        } else {
-            showNotification("Please fill in all fields", "error");
+            scheduleReminders();
+            loadSettings();
+            setupPWA();
         }
-    }
-}
 
-// Tab navigation
-function setupTabNavigation() {
-    const navButtons = document.querySelectorAll('.nav-btn-bottom');
-    
-    navButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Remove active class from all buttons and tabs
-            navButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
+        // Setup water event listeners - NEW FUNCTION
+        function setupWaterEventListeners() {
+            // Remove any existing event listeners first
+            const waterPlus = document.getElementById('water-plus');
+            const waterMinus = document.getElementById('water-minus');
+            
+            // Clone and replace to remove old event listeners
+            const newWaterPlus = waterPlus.cloneNode(true);
+            const newWaterMinus = waterMinus.cloneNode(true);
+            
+            waterPlus.parentNode.replaceChild(newWaterPlus, waterPlus);
+            waterMinus.parentNode.replaceChild(newWaterMinus, waterMinus);
+            
+            // Add new event listeners
+            newWaterPlus.addEventListener('click', function() {
+                if (appState.waterIntake < appState.waterGoal) {
+                    appState.waterIntake += 0.25;
+                    updateWaterTracker();
+                    showNotification("Great! Keep hydrating 💧", "success");
+                } else {
+                    showNotification("You've reached your water goal for today! 🎉", "success");
+                }
             });
             
-            // Add active class to clicked button
-            this.classList.add('active');
+            newWaterMinus.addEventListener('click', function() {
+                if (appState.waterIntake > 0) {
+                    appState.waterIntake -= 0.25;
+                    updateWaterTracker();
+                }
+            });
+        }
+
+        // Check and reset water intake for new day - FIXED VERSION
+        function checkAndResetDailyWater() {
+            const today = new Date().toISOString().split('T')[0];
             
-            // Show the selected tab
-            const tabId = this.getAttribute('data-tab');
-            const targetTab = document.getElementById(tabId);
-            if (targetTab) {
-                targetTab.classList.add('active');
+            // If we haven't reset today, reset the water intake
+            if (appState.lastWaterReset !== today) {
+                appState.waterIntake = 0;
+                appState.lastWaterReset = today;
+                
+                // Log the reset
+                const existingEntry = appState.waterLog.find(entry => entry.date === today);
+                if (!existingEntry) {
+                    appState.waterLog.push({
+                        date: today,
+                        amount: 0
+                    });
+                }
+                
+                updateWaterTracker();
+                saveAppState();
+                console.log("Water tracker reset for new day:", today);
             }
-        });
-    });
-}
+        }
 
-// Select day from dropdown
-function selectDay() {
-    const daySelector = document.getElementById('day-selector');
-    if (daySelector) {
-        appState.currentDay = daySelector.value;
-        updateDayDisplay();
-        loadCurrentDayMeals();
-        saveAppState();
-    }
-}
-
-// Update day display
-function updateDayDisplay() {
-    const currentDayName = document.getElementById('current-day-name');
-    if (currentDayName) {
-        const dayName = appState.currentDay.charAt(0).toUpperCase() + appState.currentDay.slice(1);
-        currentDayName.textContent = dayName;
-    }
-}
-
-// Update weight log display
-function updateWeightLog() {
-    const logContainer = document.getElementById('weight-log');
-    if (!logContainer) return;
-    
-    logContainer.innerHTML = '';
-    
-    // Sort by date (newest first)
-    const sortedLog = [...appState.weightLog].sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    sortedLog.forEach(entry => {
-        const entryDiv = document.createElement('div');
-        entryDiv.className = 'weight-entry';
-        entryDiv.innerHTML = `
-            <span class="weight-date">${entry.date}</span>: ${entry.weight} kg
-        `;
-        logContainer.appendChild(entryDiv);
-    });
-}
-
-// Update daily tip
-function updateDailyTip() {
-    const tips = [
-        "Focus on protein to speed up metabolism",
-        "Drink 3-4 liters of water daily",
-        "Eat dinner before 7:30 PM",
-        "Avoid long fasting periods",
-        "Move for 30 minutes daily",
-        "Choose lean proteins over fatty foods",
-        "Include vegetables in every meal",
-        "Limit injera portions to control carbs",
-        "Start your day with protein",
-        "Snack on fruits and nuts"
-    ];
-    
-    const randomTip = tips[Math.floor(Math.random() * tips.length)];
-    const dailyTip = document.getElementById('daily-tip');
-    if (dailyTip) {
-        dailyTip.textContent = randomTip;
-    }
-}
-
-// Update charts (simplified for now)
-function updateCharts() {
-    // Basic chart implementation - you can enhance this later
-    console.log('Charts would be updated here');
-}
-
-// Show notification
-function showNotification(message, type = "info") {
-    console.log('Notification:', message);
-    // Simple alert for now - you can enhance this with your existing notification system
-    alert(message);
-}
-
-// Initialize the app when page loads
-window.onload = function() {
-    console.log('Window loaded, initializing app...');
-    
-    // Apply saved theme
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        const modeToggle = document.getElementById('mode-toggle');
-        if (modeToggle) modeToggle.textContent = '☀️';
-    }
-    
-    // Mode toggle
-    const modeToggle = document.getElementById('mode-toggle');
-    if (modeToggle) {
-        modeToggle.addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-            if (document.body.classList.contains('dark-mode')) {
-                this.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
+        // Update water tracker - FIXED VERSION
+        function updateWaterTracker() {
+            const progress = (appState.waterIntake / appState.waterGoal) * 100;
+            
+            // Update UI elements
+            const waterFill = document.getElementById('water-fill');
+            const waterCount = document.getElementById('water-count');
+            const waterGoalDisplay = document.getElementById('water-goal-display');
+            
+            if (waterFill) waterFill.style.width = `${Math.min(progress, 100)}%`;
+            if (waterCount) waterCount.textContent = appState.waterIntake.toFixed(2);
+            if (waterGoalDisplay) waterGoalDisplay.textContent = appState.waterGoal;
+            
+            // Log water intake for today
+            const today = new Date().toISOString().split('T')[0];
+            const existingEntry = appState.waterLog.find(entry => entry.date === today);
+            
+            if (existingEntry) {
+                existingEntry.amount = appState.waterIntake;
             } else {
-                this.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            }
-        });
-    }
-    
-    // Initialize the main app
-    initApp();
-    
-    // Register service worker for PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('SW registered: ', registration);
-                })
-                .catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
+                appState.waterLog.push({
+                    date: today,
+                    amount: appState.waterIntake
                 });
-        });
-    }
-};
-    </script>
+            }
+            
+            // Update water chart if we're on the progress tab
+            updateCharts();
+            
+            // Save state
+            saveAppState();
+            
+            console.log("Water updated:", appState.waterIntake, "Goal:", appState.waterGoal);
+        }
 
+        // Load app state from localStorage - UPDATED
+        function loadAppState() {
+            const savedAppState = localStorage.getItem('cordavoAppState');
+            if (savedAppState) {
+                const parsedState = JSON.parse(savedAppState);
+                
+                // Merge with existing appState to ensure all properties exist
+                appState = {
+                    ...appState, // Default values
+                    ...parsedState, // Saved values
+                    weeklyMealPlan: parsedState.weeklyMealPlan || JSON.parse(JSON.stringify(defaultPlan))
+                };
+                
+                // Ensure currentWeight is set
+                if (!appState.currentWeight && userProfile.startingWeight) {
+                    appState.currentWeight = userProfile.startingWeight;
+                }
+                
+                // Initialize lastWaterReset if it doesn't exist
+                if (!appState.lastWaterReset) {
+                    appState.lastWaterReset = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                // Initialize with default values
+                appState.weeklyMealPlan = JSON.parse(JSON.stringify(defaultPlan));
+                appState.currentWeight = userProfile.startingWeight || 72;
+                appState.lastWaterReset = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        // Load profile from localStorage
+        function loadProfile() {
+            const savedProfile = localStorage.getItem('cordavoProfile');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+            }
+        }
+
+        // Save app state to localStorage
+        function saveAppState() {
+            localStorage.setItem('cordavoAppState', JSON.stringify(appState));
+        }
+
+        // Update the entire UI
+        function updateUI() {
+            updateHeader();
+            updateProgress();
+            updateWaterTracker(); // Make sure water tracker is updated
+            updateDailyTip();
+            loadCurrentDayMeals();
+            updateDayDisplay();
+            updateWeightLog();
+            updateCharts();
+            generateWeeklyPlan();
+        }
+
+        // ... (keep all your other existing functions like updateProgress, updateWeight, etc.)
+
+        // Generate weekly meal plan display
+        function generateWeeklyPlan() {
+            const container = document.getElementById('weekly-plan-container');
+            if (!container) return;
+            
+            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            
+            container.innerHTML = '';
+            
+            days.forEach(day => {
+                const dayPlan = appState.weeklyMealPlan[day];
+                if (!dayPlan) {
+                    console.warn(`No meal plan found for ${day}`);
+                    return;
+                }
+                
+                const dayCapitalized = day.charAt(0).toUpperCase() + day.slice(1);
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'day-plan';
+                dayDiv.innerHTML = `
+                    <h4>${dayCapitalized}</h4>
+                    <div class="day-plan-item" onclick="editMeal('${day}', 'breakfast')">Breakfast: ${dayPlan.breakfast.join(', ')}</div>
+                    <div class="day-plan-item" onclick="editMeal('${day}', 'lunch')">Lunch: ${dayPlan.lunch.join(', ')}</div>
+                    <div class="day-plan-item" onclick="editMeal('${day}', 'dinner')">Dinner: ${dayPlan.dinner.join(', ')}</div>
+                `;
+                
+                container.appendChild(dayDiv);
+            });
+        }
+
+        // Enhanced notification system with sound
+        function showNotification(message, type = "info") {
+            // Play sound if enabled
+            if (appState.soundEnabled) {
+                playNotificationSound();
+            }
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 90px;
+                right: 20px;
+                padding: 15px;
+                border-radius: 8px;
+                color: white;
+                z-index: 10000;
+                max-width: 300px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            
+            // Set background color based on type
+            if (type === "success") {
+                notification.style.background = "var(--success)";
+            } else if (type === "error") {
+                notification.style.background = "var(--error)";
+            } else if (type === "warning") {
+                notification.style.background = "var(--warning)";
+            } else {
+                notification.style.background = "var(--secondary)";
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = "translateX(0)";
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transform = "translateX(400px)";
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Tab navigation
+        function setupTabNavigation() {
+            const navButtons = document.querySelectorAll('.nav-btn-bottom');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons and tabs
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show the selected tab
+                    const tabId = this.getAttribute('data-tab');
+                    const targetTab = document.getElementById(tabId);
+                    if (targetTab) {
+                        targetTab.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // ... (keep all your other existing functions)
+
+        // Initialize the app when page loads
+        window.onload = function() {
+            applySavedTheme();
+            document.getElementById('mode-toggle').addEventListener('click', toggleMode);
+            document.getElementById('settings-toggle').addEventListener('click', openSettingsModal);
+            initApp();
+        };
+
+        // Debug function to check water state
+        function debugWater() {
+            console.log("Water State:", {
+                intake: appState.waterIntake,
+                goal: appState.waterGoal,
+                lastReset: appState.lastWaterReset,
+                today: new Date().toISOString().split('T')[0],
+                log: appState.waterLog
+            });
+        }
+
+        // You can call debugWater() in console to check water state
+    </script>
 </body>
 </html>
