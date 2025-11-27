@@ -706,22 +706,58 @@
             color: var(--primary-dark);
             margin-bottom: 10px;
         }
-        .install-btn {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            display: none;
-        }
+        /* Install Button Styles */
+.install-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 15px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.install-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.install-btn.show {
+    display: flex;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(76, 175, 80, 0.7);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .install-btn {
+        bottom: 80px;
+        right: 10px;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+}
     </style>
 </head>
 <body>
@@ -731,11 +767,11 @@
             <div class="header-controls">
                 <button class="settings-toggle" id="settings-toggle">⚙️</button>
                 <button class="mode-toggle" id="mode-toggle">🌙</button>
-            </div>
-             <!-- Install Button -->
-            <button class="install-btn" id="installButton" onclick="installApp()">📲</button>
+                <!-- Install Button -->
+                <button class="install-btn" id="installButton" onclick="installApp()">📲</button>
         </header>
-        
+            </div>
+  
         <!-- Home Tab -->
         <div id="home-tab" class="tab-content active">
             <div class="progress-section">
@@ -1031,8 +1067,8 @@
             <div class="settings-option">
                 <h4>About</h4>
                 <p style="font-size: 0.9em; color: var(--text-secondary);">
-                    Diet-plan v1.0 - Weight Loss Plan<br>
-                    Designed for Someone Special..!
+                    Cordavo v1.0 - Ethiopian Weight Loss Plan<br>
+                    Designed for healthy, sustainable weight loss
                 </p>
             </div>
         </div>
@@ -1042,7 +1078,7 @@
     <div class="profile-setup-modal" id="profile-setup-modal">
         <div class="modal-content">
             <div class="setup-welcome">
-                <h2>Selam Aytoye!</h2>
+                <h2>Aytoye..!</h2>
                 <p>Let's set up your personalized weight loss plan</p>
             </div>
             
@@ -1072,8 +1108,8 @@
     
     <div class="nav-bar">
         <button class="nav-btn-bottom active" data-tab="home-tab">🏠 Home</button>
-        <button class="nav-btn-bottom" data-tab="plan-tab"> Plan</button>
-        <button class="nav-btn-bottom" data-tab="progress-tab"> Progress</button>
+        <button class="nav-btn-bottom" data-tab="plan-tab">Plan</button>
+        <button class="nav-btn-bottom" data-tab="progress-tab">Progress</button>
         <button class="nav-btn-bottom" data-tab="tips-tab">💡 Tips</button>
     </div>
 
@@ -1205,16 +1241,17 @@ function generateWeeklyPlan() {
             // Set up tab navigation FIRST
             setupTabNavigation();
 
-            // Check and reset water for new day
-            checkAndResetDailyWater();
             
             // Check if profile is complete
             if (!userProfile.name) {
                 showProfileSetup();
                 return;
-            }
+            } 
             
-            // Initialize water buttons
+            // Check and reset water for new day
+              checkAndResetDailyWater();
+            
+              // Initialize water buttons
     document.getElementById('water-plus').addEventListener('click', function() {
         if (appState.waterIntake < appState.waterGoal) {
             appState.waterIntake += 0.25;
@@ -1426,6 +1463,7 @@ function checkAndResetDailyWater() {
         showNotification("New day! Water tracker has been reset 💧", "info");
     }
 }
+
     // Update water chart
     updateCharts();
     
@@ -1716,7 +1754,7 @@ function updateCharts() {
             }
         }
         
-        // Tab navigation
+        // Tab navigation - CORRECTED VERSION
 function setupTabNavigation() {
     const navButtons = document.querySelectorAll('.nav-btn-bottom');
     
@@ -2096,5 +2134,6 @@ Keep up the great work! 💪`;
             initApp();
         };
     </script>
+
 </body>
 </html>
