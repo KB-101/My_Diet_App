@@ -1,27 +1,30 @@
 const CACHE_NAME = "Diet-plan-v1.0";
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/icons/icon-72x72.png",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icons/icon-72x72.png',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 // Install event
 self.addEventListener('install', (event) => {
-  console.log('Service Worker installing');
+  console.log('Service Worker installing for mobile');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
-// Fetch event
+// Fetch event - optimized for mobile
 self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -29,29 +32,32 @@ self.addEventListener('fetch', (event) => {
         if (response) {
           return response;
         }
-        
-        // Otherwise fetch from network
+
+        // For navigation requests, prioritize offline page
+        if (event.request.mode === 'navigate') {
+          return fetch(event.request)
+            .catch(() => {
+              return caches.match('/index.html');
+            });
+        }
+
+        // For other requests, try network first
         return fetch(event.request)
           .then((response) => {
-            // Check if valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
+            // Cache successful responses
+            if (response.status === 200) {
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(event.request, responseToCache);
+                });
             }
-            
-            // Clone the response
-            const responseToCache = response.clone();
-            
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-              
             return response;
           })
           .catch(() => {
-            // If navigation request and fetch fails, return the homepage
-            if (event.request.mode === 'navigate') {
-              return caches.match('/index.html');
+            // If request fails and it's an image, return a placeholder
+            if (event.request.destination === 'image') {
+              return caches.match('/icons/icon-192x192.png');
             }
           });
       })
@@ -60,13 +66,11 @@ self.addEventListener('fetch', (event) => {
 
 // Activate event
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker activating');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
